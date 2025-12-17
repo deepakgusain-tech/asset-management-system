@@ -40,9 +40,6 @@ export function NavUser({
   }
 }) {
 
-  console.log(user);
-
-
   const { isMobile } = useSidebar()
 
   return (
@@ -93,12 +90,12 @@ export function NavUser({
                 <Bell />
                 Notifications
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/admin/setting" className="flex gap-2">
+              <Link href="/admin/setting" className="flex gap-2">
+                <DropdownMenuItem>
                   <Settings2 />
                   Setting
-                </Link>
-              </DropdownMenuItem>
+                </DropdownMenuItem>
+              </Link>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
