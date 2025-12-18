@@ -17,6 +17,12 @@ import { getModules } from "@/lib/actions/module-action"
 import { RoleTable } from "./role-table"
 import { UserTable } from "./user-table"
 import { ModuleTable } from "./module-table"
+import React from "react"
+import { Button } from "@/components/ui/button"
+import AddAndUpdateRolePopover from "./role-form"
+import { roleDefaultValues } from "@/lib/constants"
+import AddAndUpdateUserPopover from "./user-form"
+import AddAndUpdateModulePopover from "./module-form"
 
 export default async function Setting() {
     const users = await getUsers()
@@ -34,7 +40,10 @@ export default async function Setting() {
                 <TabsContent value="user">
                     <Card>
                         <CardHeader>
-                            <CardTitle>User</CardTitle>
+                            <div className="flex justify-between items-center">
+                                <CardTitle>User</CardTitle>
+                                <AddAndUpdateUserPopover update={false} />
+                            </div>
                         </CardHeader>
                         <CardContent className="grid gap-6">
                             <UserTable user={users as User[]} />
@@ -44,7 +53,10 @@ export default async function Setting() {
                 <TabsContent value="role">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Role</CardTitle>
+                            <div className="flex justify-between items-center">
+                                <CardTitle>Role</CardTitle>
+                                <AddAndUpdateRolePopover update={false} />
+                            </div>
                         </CardHeader>
                         <CardContent className="grid gap-6">
                             <RoleTable role={roles as Role[]} />
@@ -54,7 +66,10 @@ export default async function Setting() {
                 <TabsContent value="module">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Module</CardTitle>
+                            <div className="flex justify-between items-center">
+                                <CardTitle>Module</CardTitle>
+                                <AddAndUpdateModulePopover update={false} />
+                            </div>
                         </CardHeader>
                         <CardContent className="grid gap-6">
                             <ModuleTable modules={modules as Module[]} />

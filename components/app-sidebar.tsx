@@ -5,13 +5,26 @@ import {
   AudioWaveform,
   BookOpen,
   Bot,
+  BuildingIcon,
   Command,
+  ComputerIcon,
   Frame,
   GalleryVerticalEnd,
+  Laptop2Icon,
+  LocateIcon,
+  LocationEdit,
   Map,
+  PersonStanding,
+  PersonStandingIcon,
   PieChart,
   Settings2,
+  Settings2Icon,
+  SettingsIcon,
   SquareTerminal,
+  User,
+  User2,
+  UserCog,
+  UserPlus,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -26,6 +39,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { APP_NAME } from "@/lib/constants"
+import { IconTableSpark } from "@tabler/icons-react"
 
 // This is sample data.
 const data = {
@@ -43,90 +57,76 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      title: "Device",
+      url: "/admin/device",
+      icon: Laptop2Icon,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Device",
+          url: "/admin/device",
+          icon: Laptop2Icon,
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Device Category",
+          url: "/admin/device-category",
+          icon: ComputerIcon,
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Device Assigned",
+          url: "/admin/device-assigned",
+          icon: UserPlus,
         },
-      ],
+      ]
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
+      title: "Employee",
+      url: "/admin/employee",
+      icon: PersonStanding,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Employee",
+          url: "/admin/employee",
+          icon: PersonStandingIcon,
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Department",
+          url: "/admin/department",
+          icon: BuildingIcon,
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Location",
+          url: "/admin/location",
+          icon: LocationEdit,
         },
-      ],
+      ]
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
+      title: "User",
+      url: "/admin/user",
+      icon: User2,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "User",
+          url: "/admin/user",
+          icon: User,
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "Role",
+          url: "/admin/role",
+          icon: UserCog,
         },
         {
-          title: "Tutorials",
-          url: "#",
+          title: "Module",
+          url: "/admin/module",
+          icon: IconTableSpark,
         },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      ]
     },
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: Settings2,
-    //   items: [
-    //     {
-    //       title: "General",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Team",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Billing",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Limits",
-    //       url: "#",
-    //     },
-    //   ],
-    // },
+    {
+      title: "Configuration",
+      url: "/admin/configuration",
+      icon: SettingsIcon,
+    }
   ],
   projects: [
     {

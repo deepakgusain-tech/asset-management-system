@@ -7,6 +7,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -76,4 +81,79 @@ model Module {
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model DeviceCategory {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String @unique(map: "device_category_name_idx")
+  description String
+  status      Status @default(ACTIVE)
+
+  device Device[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+enum DeviceStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  RETIRED
+}
+
+model Device {
+  id           String  @id @default(cuid())
+  name         String
+  serialNumber String  @unique
+  description  String?
+
+  status DeviceStatus @default(ACTIVE)
+
+  categoryId String         @db.Uuid
+  category   DeviceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  manufacturer String?
+  model        String?
+  purchaseDate DateTime?
+  warrantyEnd  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([status])
+}
+
+model Department {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String     @unique(map: "department_name_idx")
+  description String
+  status      Status     @default(ACTIVE)
+  employee    Employee[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Employee {
+  id          String    @id @default(cuid())
+  first_name  String
+  last_name   String    @unique
+  email       String?
+  phoneNumber String?
+  dateOfBirth DateTime?
+  hireDate    DateTime?
+  salary      String
+
+  status DeviceStatus @default(ACTIVE)
+
+  departmentId String     @db.Uuid
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([departmentId])
+  @@index([status])
 }
