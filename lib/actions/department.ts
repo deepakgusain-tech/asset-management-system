@@ -2,7 +2,7 @@
 
 import { Department } from "@/types";
 import { prisma } from "../db/prisma-helper";
-import { departmentSchema, deviceCateorySchema } from "../validators";
+import { departmentSchema } from "../validators";
 import { formatError } from "../utils";
 
 // get device categories

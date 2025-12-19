@@ -2,6 +2,8 @@ import {
     departmentSchema,
     deviceCateorySchema, 
     deviceSchema, 
+    employeeSchema, 
+    locationSchema, 
     moduleSchema, 
     roleSchema, 
     userSchema 
@@ -15,4 +17,6 @@ export type Module = z.infer<typeof moduleSchema>
 export type DeviceCategory = z.infer<typeof deviceCateorySchema>
 export type Device = z.infer<typeof deviceSchema>
 export type Department = z.infer<typeof departmentSchema>
+export type Location = z.infer<typeof locationSchema>
+export type Employee = z.infer<typeof employeeSchema>
 

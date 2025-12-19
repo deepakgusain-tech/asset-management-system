@@ -84,7 +84,24 @@ export const employeeSchema = z.object({
     hireDate: z.date().nullable().optional(),
     salary: z.string().min(1, "Employee salary is required"),
     status: z.enum(["ACTIVE", "INACTIVE"]),
-    departmentId: z.string().min(1, "Department id is required"),
+    departmentId: z.string().min(1, "Department is required"),
+    locationId: z.string().min(1, "Location is required"),
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional()
+})
+
+// location schema
+export const locationSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().min(1, "Location name is required"),
+    streetAddress: z.string().min(1, "Street Address is required"),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    postalCode:z.string().min(1, "Postal Code is required"),
+    country:z.string().min(1, "Country is required"),
+    latitude: z.string().optional(),
+    longitude: z.string().optional(),
+    status: z.enum(["ACTIVE", "INACTIVE"]),
     createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })

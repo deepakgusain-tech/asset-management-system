@@ -136,8 +136,28 @@ model Department {
   updatedAt DateTime @updatedAt @db.Timestamp(6)
 }
 
+model Location {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String    @unique(map: "location_name_idx")
+  streetAddress String
+  city          String
+  state         String
+  postalCode    String
+  country       String
+  latitude      String?
+  longitude     String?
+  employee      Employee[]
+
+  status Status @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
 model Employee {
-  id          String    @id @default(cuid())
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   first_name  String
   last_name   String    @unique
   email       String?
@@ -146,14 +166,18 @@ model Employee {
   hireDate    DateTime?
   salary      String
 
-  status DeviceStatus @default(ACTIVE)
+  status Status @default(ACTIVE)
 
   departmentId String     @db.Uuid
   department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  locationId String   @db.Uuid
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([departmentId])
+  @@index([locationId])
   @@index([status])
 }

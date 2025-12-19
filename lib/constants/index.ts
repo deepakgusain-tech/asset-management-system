@@ -4,7 +4,6 @@ export const APP_NAME = process.env.NEXT_APP_APP_NAME ?? "Asset Management Syste
 export const APP_DESCRIPTION = process.env.NEXT_APP_DESCRIPTION ?? "Asset Management System"
 export const SERVER_URL = process.env.NEXT_APP_SERVER_URL ?? "http://localhost:3000"
 
-
 export const roleDefaultValues = {
     name: "",
     description: "",
@@ -60,6 +59,19 @@ export const employeeDefaultValues = {
     dateOfBirth: null,
     hireDate: null,
     salary: "",
-    status: Status.ACTIVE,
     departmentId: "",
+    locationId: "",
+    status: Status.ACTIVE,
+}
+
+export const locationDefaultValues = {
+    name: "",
+    streetAddress: "",
+    city: "",
+    state: "",
+    postalCode: "", 
+    country: "",
+    latitude: "", 
+    longitude: "",
+    status: Status.ACTIVE,
 }
