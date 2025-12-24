@@ -34,9 +34,9 @@ const DepartmentForm = ({ data, update = false }: { data?: Department, update: b
         startTransition(async () => {
             let res;
 
-            if(update && id) {
+            if (update && id) {
                 res = await updateDepartment(values, id)
-            }else {
+            } else {
                 res = await createDepartment(values)
             }
 
@@ -53,25 +53,58 @@ const DepartmentForm = ({ data, update = false }: { data?: Department, update: b
     return (
         <Form {...form}>
             <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='name'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof departmentSchema>, "name">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter name' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                <div className='grid grid-cols-2 gap-4'>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='name'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof departmentSchema>, "name">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter name' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='status'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof departmentSchema>, "status">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <FormControl>
+                                        <Select
+                                            defaultValue={field.value}
+                                            onValueChange={(v) => field.onChange(v as Status)}
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value={Status.ACTIVE}>Active</SelectItem>
+                                                <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
                 </div>
+
                 <div className='flex flex-col gap-5'>
                     <FormField
                         control={form.control}
@@ -91,36 +124,7 @@ const DepartmentForm = ({ data, update = false }: { data?: Department, update: b
                         )}
                     />
                 </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='status'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof departmentSchema>, "status">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Status</FormLabel>
-                                <FormControl>
-                                    <Select
-                                        defaultValue={field.value}
-                                        onValueChange={(v) => field.onChange(v as Status)}
-                                    >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={Status.ACTIVE}>Active</SelectItem>
-                                            <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
+
                 <div className='flex gap-2'>
                     <Button type='submit' className='cursor-pointer' disabled={isPending}>
                         {

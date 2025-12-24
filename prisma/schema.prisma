@@ -12,6 +12,12 @@ enum Status {
   INACTIVE
 }
 
+enum AssignedDeviceStatus {
+  ASSIGNED
+  NOTASSIGNED
+  RETURNED
+}
+
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -103,7 +109,7 @@ enum DeviceStatus {
 }
 
 model Device {
-  id           String  @id @default(cuid())
+  id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name         String
   serialNumber String  @unique
   description  String?
@@ -117,6 +123,8 @@ model Device {
   model        String?
   purchaseDate DateTime?
   warrantyEnd  DateTime?
+
+  device DeviceAssigned[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -137,8 +145,8 @@ model Department {
 }
 
 model Location {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String    @unique(map: "location_name_idx")
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String     @unique(map: "location_name_idx")
   streetAddress String
   city          String
   state         String
@@ -177,7 +185,31 @@ model Employee {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  device DeviceAssigned[]
+
   @@index([departmentId])
   @@index([locationId])
   @@index([status])
+}
+
+model DeviceAssigned {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  assignedDate DateTime  @default(now()) @db.Timestamp(6)
+  returnedDate DateTime? @default(now()) @db.Timestamp(6)
+
+  status  AssignedDeviceStatus @default(NOTASSIGNED)
+  remarks String
+
+  deviceId String @db.Uuid
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  employeeId String @db.Uuid
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([deviceId])
+  @@index([employeeId])
 }

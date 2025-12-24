@@ -55,7 +55,7 @@ const EmployeeForm = ({ data, update = false, locations, departments }: { data?:
     }
     return (
         <Form {...form}>
-            <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
+            <form className='space-y-4 grid grid-cols-2 gap-4' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
                 <div className='flex flex-col gap-5'>
                     <FormField
                         control={form.control}
@@ -104,7 +104,7 @@ const EmployeeForm = ({ data, update = false, locations, departments }: { data?:
                             field: ControllerRenderProps<z.infer<typeof employeeSchema>, "email">
                         }) => (
                             <FormItem>
-                                <FormLabel>Mail</FormLabel>
+                                <FormLabel>Email</FormLabel>
                                 <FormControl>
                                     <Input placeholder='Enter email' {...field} />
                                 </FormControl>
@@ -143,7 +143,7 @@ const EmployeeForm = ({ data, update = false, locations, departments }: { data?:
                             field: ControllerRenderProps<z.infer<typeof employeeSchema>, "dateOfBirth">
                         }) => (
                             <FormItem>
-                                <FormLabel>Purchase Date</FormLabel>
+                                <FormLabel>Date of birth</FormLabel>
                                 <FormControl>
                                     <Popover>
                                         <PopoverTrigger asChild>
@@ -182,7 +182,7 @@ const EmployeeForm = ({ data, update = false, locations, departments }: { data?:
                             field: ControllerRenderProps<z.infer<typeof employeeSchema>, "hireDate">
                         }) => (
                             <FormItem>
-                                <FormLabel>Purchase Date</FormLabel>
+                                <FormLabel>Hire Date</FormLabel>
                                 <FormControl>
                                     <Popover>
                                         <PopoverTrigger asChild>
@@ -221,7 +221,7 @@ const EmployeeForm = ({ data, update = false, locations, departments }: { data?:
                             field: ControllerRenderProps<z.infer<typeof employeeSchema>, "salary">
                         }) => (
                             <FormItem>
-                                <FormLabel>Mail</FormLabel>
+                                <FormLabel>Salary</FormLabel>
                                 <FormControl>
                                     <Input placeholder='Enter Salary' {...field} />
                                 </FormControl>
@@ -316,8 +316,6 @@ const EmployeeForm = ({ data, update = false, locations, departments }: { data?:
                                         <SelectContent>
                                             <SelectItem value={DeviceStatus.ACTIVE}>Active</SelectItem>
                                             <SelectItem value={DeviceStatus.INACTIVE}>Inactive</SelectItem>
-                                            <SelectItem value={DeviceStatus.MAINTENANCE}>Maintenance</SelectItem>
-                                            <SelectItem value={DeviceStatus.RETIRED}>Retired</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </FormControl>

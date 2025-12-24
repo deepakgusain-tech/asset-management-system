@@ -33,9 +33,9 @@ const LocationForm = ({ data, update = false }: { data?: Location, update: boole
         startTransition(async () => {
             let res;
 
-            if(update && id) {
+            if (update && id) {
                 res = await updateLocation(values, id)
-            }else {
+            } else {
                 res = await createLocation(values)
             }
 
@@ -51,187 +51,189 @@ const LocationForm = ({ data, update = false }: { data?: Location, update: boole
     return (
         <Form {...form}>
             <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='name'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "name">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter name' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='streetAddress'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "streetAddress">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Street Address</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter street address' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='city'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "city">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>City</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter City' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='state'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "state">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>State</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter state' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='postalCode'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "postalCode">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Postal Code</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter Postal Code' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='country'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "country">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Country</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter country' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='latitude'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "latitude">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Latitude</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter latitude' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='longitude'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "longitude">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Longitude</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter longitude' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='status'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof locationSchema>, "status">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Status</FormLabel>
-                                <FormControl>
-                                    <Select
-                                        defaultValue={field.value}
-                                        onValueChange={(v) => field.onChange(v as Status)}
-                                    >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={Status.ACTIVE}>Active</SelectItem>
-                                            <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                <div className='grid grid-cols-2 gap-4'>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='name'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "name">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter name' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='streetAddress'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "streetAddress">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Street Address</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter street address' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='city'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "city">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>City</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter City' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='state'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "state">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>State</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter state' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='postalCode'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "postalCode">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Postal Code</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter Postal Code' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='country'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "country">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Country</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter country' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='latitude'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "latitude">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Latitude</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter latitude' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='longitude'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "longitude">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Longitude</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter longitude' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='status'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof locationSchema>, "status">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <FormControl>
+                                        <Select
+                                            defaultValue={field.value}
+                                            onValueChange={(v) => field.onChange(v as Status)}
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value={Status.ACTIVE}>Active</SelectItem>
+                                                <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
                 </div>
                 <div className='flex gap-2'>
                     <Button type='submit' className='cursor-pointer' disabled={isPending}>

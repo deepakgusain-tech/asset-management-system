@@ -52,7 +52,7 @@ const DeviceCategoryForm = ({ data, update = false }: { data?: DeviceCategory, u
     }
     return (
         <Form {...form}>
-            <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
+            <form className='space-y-4 grid grid-cols-2 gap-2' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
                 <div className='flex flex-col gap-5'>
                     <FormField
                         control={form.control}

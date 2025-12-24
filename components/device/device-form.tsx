@@ -54,10 +54,12 @@ const DeviceForm = ({ data, update = false, categories }: { data?: Device, updat
 
         })
     }
+
     return (
         <Form {...form}>
-            <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
-                <div className='flex flex-col gap-5'>
+            <form className='space-y-4  ' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
+                <div className='grid grid-cols-2 gap-4'>
+                    <div className='flex flex-col gap-5 '>
                     <FormField
                         control={form.control}
                         name='name'
@@ -95,25 +97,7 @@ const DeviceForm = ({ data, update = false, categories }: { data?: Device, updat
                         )}
                     />
                 </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='description'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof deviceSchema>, "description">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Description</FormLabel>
-                                <FormControl>
-                                    <Textarea rows={20} className='h-40' placeholder='Enter name' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
+
                 <div className='flex flex-col gap-5'>
                     <FormField
                         control={form.control}
@@ -219,7 +203,7 @@ const DeviceForm = ({ data, update = false, categories }: { data?: Device, updat
                                         <PopoverContent className="w-auto p-0">
                                             <Calendar
                                                 mode="single"
-                                                selected={field.value  as Date}
+                                                selected={field.value as Date}
                                                 onSelect={field.onChange}
                                             />
                                         </PopoverContent>
@@ -288,6 +272,26 @@ const DeviceForm = ({ data, update = false, categories }: { data?: Device, updat
                                             <SelectItem value={DeviceStatus.RETIRED}>Retired</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+                </div>
+                <div className='flex flex-col gap-5'>
+                    <FormField
+                        control={form.control}
+                        name='description'
+                        render={({
+                            field
+                        }: {
+                            field: ControllerRenderProps<z.infer<typeof deviceSchema>, "description">
+                        }) => (
+                            <FormItem>
+                                <FormLabel>Description</FormLabel>
+                                <FormControl>
+                                    <Textarea rows={20} className='h-40' placeholder='Enter name' {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
