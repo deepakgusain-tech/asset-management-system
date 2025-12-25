@@ -18,6 +18,13 @@ enum AssignedDeviceStatus {
   RETURNED
 }
 
+enum DeviceStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  RETIRED
+}
+
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -25,10 +32,12 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String
-  role          Int?
+  roleId        String    @db.Uuid
   accounts      Account[]
   sessions      Session[]
-  status        Boolean   @default(false)
+  status        Status    @default(ACTIVE)
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
@@ -66,22 +75,23 @@ model Session {
 }
 
 model Role {
-  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String  @unique(map: "role_name_idx")
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String @unique(map: "role_name_idx")
   description String
-  status      Boolean @default(false)
+  status      Status @default(ACTIVE)
 
   module    Module[]
+  user      User[]
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
 }
 
 model Module {
-  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String  @unique(map: "module_name_idx")
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String @unique(map: "module_name_idx")
   description String
-  roleId      String  @db.Uuid
-  status      Boolean @default(false)
+  roleId      String @db.Uuid
+  status      Status @default(ACTIVE)
 
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
@@ -99,13 +109,6 @@ model DeviceCategory {
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
-}
-
-enum DeviceStatus {
-  ACTIVE
-  INACTIVE
-  MAINTENANCE
-  RETIRED
 }
 
 model Device {
@@ -204,7 +207,7 @@ model DeviceAssigned {
   deviceId String @db.Uuid
   device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
-  employeeId String @db.Uuid
+  employeeId String   @db.Uuid
   employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())

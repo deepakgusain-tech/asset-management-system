@@ -8,6 +8,7 @@ import DeviceAssignedTable from './device-assigned-table'
 import { getAssignedDevices } from '@/lib/actions/device-assigned-action'
 import { getDevice } from '@/lib/actions/device-action'
 import { getEmployee } from '@/lib/actions/employee'
+import { Device, Employee } from '@/types'
 
 const DeviceAssignedPage = async () => {
     const deviceAssigned = await getAssignedDevices()
@@ -25,7 +26,7 @@ const DeviceAssignedPage = async () => {
                 </div>
             </CardHeader>
             <CardContent className='w-full'>
-                <DeviceAssignedTable data={deviceAssigned} devices={devices} employees={empoloyees} />
+                <DeviceAssignedTable data={deviceAssigned} devices={devices as Device[]} employees={empoloyees as Employee[]} />
             </CardContent>
         </Card>
     )

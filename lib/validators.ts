@@ -1,5 +1,5 @@
 import z from "zod"
-import { AssignedDeviceStatus } from "./generated/prisma/enums"
+import { AssignedDeviceStatus, Status } from "./generated/prisma/enums"
 
 export const statusEnum = z.enum(["ACTIVE", "INACTIVE"])
 
@@ -10,8 +10,8 @@ export const userSchema = z.object({
     email: z.email().min(1, "User email is required"),
     image: z.string().min(1, "User image is required"),
     password: z.string().min(1, "User password is required"),
-    status: z.boolean().default(false).optional(),
-    role: z.int().nullable(),
+    status: z.enum(Object.values(Status)),
+    roleId: z.string(),
     createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })
@@ -21,18 +21,18 @@ export const roleSchema = z.object({
     id: z.string().min(1, "Role id is required"),
     name: z.string().min(1, "Role name is required"),
     description: z.string().min(1, "Role description is required"),
-    status: z.boolean().optional(),
+    status: z.enum(Object.values(Status)),
     createdAt: z.date().nullable(),
     updatedAt: z.date().nullable()
 })
 
 // module schema 
 export const moduleSchema = z.object({
-    id: z.string().min(1, "Role id is required"),
+    id: z.string().optional(),
     name: z.string().min(1, "Role name is required"),
     description: z.string().min(1, "Role description is required"),
     roleId: z.string(),
-    status: z.boolean().optional(),
+    status: z.enum(Object.values(Status)),
     createdAt: z.date().nullable(),
     updatedAt: z.date().nullable()
 })
@@ -42,7 +42,7 @@ export const deviceCateorySchema = z.object({
     id: z.string().optional(),
     name: z.string().min(1, "Device Category name is required"),
     description: z.string().min(1, "Device Category description is required"),
-    status: z.enum(["ACTIVE", "INACTIVE"]),
+    status: z.enum(Object.values(Status)),
     createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })
@@ -53,7 +53,7 @@ export const deviceSchema = z.object({
     name: z.string().min(1, "Device name is required"),
     serialNumber: z.string().min(1, "Device serial number is required"),
     description: z.string().min(1, "Device description is required"),
-    status: z.enum(["ACTIVE", "INACTIVE"]),
+    status: z.enum(Object.values(Status)),
     categoryId: z.string().min(1, "Device categoryid is required"),
     manufacturer: z.string().min(1, "Device manufacturer is required"),
     model: z.string().min(1, "Device model is required"),
@@ -68,7 +68,7 @@ export const departmentSchema = z.object({
     id: z.string().optional(),
     name: z.string().min(1, "Department name is required"),
     description: z.string().min(1, "Department description is required"),
-    status: z.enum(["ACTIVE", "INACTIVE"]),
+    status: z.enum(Object.values(Status)),
     createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })
@@ -83,7 +83,7 @@ export const employeeSchema = z.object({
     dateOfBirth: z.date().nullable().optional(),
     hireDate: z.date().nullable().optional(),
     salary: z.string().min(1, "Employee salary is required"),
-    status: z.enum(["ACTIVE", "INACTIVE"]),
+    status: z.enum(Object.values(Status)),
     departmentId: z.string().min(1, "Department is required"),
     locationId: z.string().min(1, "Location is required"),
     createdAt: z.date().nullable().optional(),
@@ -101,7 +101,7 @@ export const locationSchema = z.object({
     country: z.string().min(1, "Country is required"),
     latitude: z.string().optional(),
     longitude: z.string().optional(),
-    status: z.enum(["ACTIVE", "INACTIVE"]),
+    status: z.enum(Object.values(Status)),
     createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })

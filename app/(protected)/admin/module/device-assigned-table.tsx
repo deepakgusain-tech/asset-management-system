@@ -4,18 +4,19 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { deleteDepartment } from '@/lib/actions/department';
 import { getAssignedDevices } from '@/lib/actions/device-assigned-action';
-import { Device, DeviceAssigned, Employee } from '@/types'
+import { getModules } from '@/lib/actions/module-action';
+import { Device, DeviceAssigned, Employee, Module } from '@/types'
 import { EditIcon, Trash } from 'lucide-react';
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner';
 
-const DeviceAssignedTable = ({ data, devices, employees }: { data: DeviceAssigned[], devices: Device[] , employees: Employee[] }) => {
+const ModuleTable = ({ data }: { data: Module[]}) => {
 
-    const [assignedDevice, setAssignedDevice] = useState<DeviceAssigned[]>(data)
+    const [assignedDevice, setAssignedDevice] = useState<Module[]>(data)
 
     const deleteDeviceAssignedHandler = async (id: any) => {
-        let res = await deleteDepartment(id);
+        let res = await deleteModu(id);
 
         if (!res?.success) {
             toast.error("Error", {
@@ -26,7 +27,7 @@ const DeviceAssignedTable = ({ data, devices, employees }: { data: DeviceAssigne
                 description: res?.message
             })
 
-            const response = await getAssignedDevices()
+            const response = await getModules()
             setAssignedDevice(response)
         }
     }
@@ -70,4 +71,4 @@ const DeviceAssignedTable = ({ data, devices, employees }: { data: DeviceAssigne
     )
 }
 
-export default DeviceAssignedTable
+export default ModuleTable

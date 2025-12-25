@@ -48,7 +48,7 @@ const DeviceAssignedForm = ({ data, update = false, devices, employees }: { data
                     description: res?.message
                 })
             } else {
-                router.push("/admin/device")
+                router.push("/admin/device-assigned")
             }
 
         })
