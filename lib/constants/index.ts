@@ -1,4 +1,4 @@
-import { DeviceStatus, Status } from "../generated/prisma/enums"
+import { AssignedDeviceStatus, DeviceStatus, Status } from "../generated/prisma/enums"
 
 export const APP_NAME = process.env.NEXT_APP_APP_NAME ?? "Asset Management System"
 export const APP_DESCRIPTION = process.env.NEXT_APP_DESCRIPTION ?? "Asset Management System"
@@ -69,9 +69,18 @@ export const locationDefaultValues = {
     streetAddress: "",
     city: "",
     state: "",
-    postalCode: "", 
+    postalCode: "",
     country: "",
-    latitude: "", 
+    latitude: "",
     longitude: "",
     status: Status.ACTIVE,
+}
+
+export const assignedDeviceDefaultValues = {
+    deviceId: "",
+    employeeId: "",
+    remarks: "",
+    status: AssignedDeviceStatus.NOTASSIGNED,
+    assignedDate: new Date(),
+    returnedDate: new Date(),
 }

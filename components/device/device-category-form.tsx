@@ -34,9 +34,9 @@ const DeviceCategoryForm = ({ data, update = false }: { data?: DeviceCategory, u
         startTransition(async () => {
             let res;
 
-            if(update && id) {
+            if (update && id) {
                 res = await updateCategoryDevice(values, id)
-            }else {
+            } else {
                 res = await createDeviceCategory(values)
             }
 
@@ -52,25 +52,57 @@ const DeviceCategoryForm = ({ data, update = false }: { data?: DeviceCategory, u
     }
     return (
         <Form {...form}>
-            <form className='space-y-4 grid grid-cols-2 gap-2' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='name'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof deviceCateorySchema>, "name">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder='Enter name' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+            <form className='space-y-4' onSubmit={form.handleSubmit(onSubmit, (errors) => console.log(errors))}>
+                <div className='grid grid-cols-2 gap-2'>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='name'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof deviceCateorySchema>, "name">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Name</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder='Enter name' {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+                    <div className='flex flex-col gap-5'>
+                        <FormField
+                            control={form.control}
+                            name='status'
+                            render={({
+                                field
+                            }: {
+                                field: ControllerRenderProps<z.infer<typeof deviceCateorySchema>, "status">
+                            }) => (
+                                <FormItem>
+                                    <FormLabel>Status</FormLabel>
+                                    <FormControl>
+                                        <Select
+                                            defaultValue={field.value}
+                                            onValueChange={(v) => field.onChange(v as Status)}
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value={Status.ACTIVE}>Active</SelectItem>
+                                                <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
                 </div>
                 <div className='flex flex-col gap-5'>
                     <FormField
@@ -85,36 +117,6 @@ const DeviceCategoryForm = ({ data, update = false }: { data?: DeviceCategory, u
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
                                     <Textarea rows={20} className='h-40' placeholder='Enter name' {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                </div>
-                <div className='flex flex-col gap-5'>
-                    <FormField
-                        control={form.control}
-                        name='status'
-                        render={({
-                            field
-                        }: {
-                            field: ControllerRenderProps<z.infer<typeof deviceCateorySchema>, "status">
-                        }) => (
-                            <FormItem>
-                                <FormLabel>Status</FormLabel>
-                                <FormControl>
-                                    <Select
-                                        defaultValue={field.value}
-                                        onValueChange={(v) => field.onChange(v as Status)}
-                                    >
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Status" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value={Status.ACTIVE}>Active</SelectItem>
-                                            <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
-                                        </SelectContent>
-                                    </Select>
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

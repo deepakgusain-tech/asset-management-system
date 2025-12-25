@@ -1,5 +1,5 @@
 import z from "zod"
-import { Status } from "./generated/prisma/enums"
+import { AssignedDeviceStatus } from "./generated/prisma/enums"
 
 export const statusEnum = z.enum(["ACTIVE", "INACTIVE"])
 
@@ -97,11 +97,30 @@ export const locationSchema = z.object({
     streetAddress: z.string().min(1, "Street Address is required"),
     city: z.string().min(1, "City is required"),
     state: z.string().min(1, "State is required"),
-    postalCode:z.string().min(1, "Postal Code is required"),
-    country:z.string().min(1, "Country is required"),
+    postalCode: z.string().min(1, "Postal Code is required"),
+    country: z.string().min(1, "Country is required"),
     latitude: z.string().optional(),
     longitude: z.string().optional(),
     status: z.enum(["ACTIVE", "INACTIVE"]),
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional()
+})
+
+// device assigned schema
+export const deviceAssignedSchema = z.object({
+    id: z.string().optional(),
+    deviceId: z.string(),
+    employeeId: z.string(),
+    remarks: z.string(),
+    status: z.enum(Object.values(AssignedDeviceStatus)),
+    assignedDate: z.union([
+        z.date(),
+        z.string()
+    ]),
+    returnedDate: z.union([
+        z.date(),
+        z.string()
+    ]).nullable().optional(),
     createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })
