@@ -18,12 +18,12 @@ export const userSchema = z.object({
 
 // role schema
 export const roleSchema = z.object({
-    id: z.string().min(1, "Role id is required"),
+    id: z.string().min(1, "Role id is required").optional(),
     name: z.string().min(1, "Role name is required"),
     description: z.string().min(1, "Role description is required"),
     status: z.enum(Object.values(Status)),
-    createdAt: z.date().nullable(),
-    updatedAt: z.date().nullable()
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional()
 })
 
 // module schema 

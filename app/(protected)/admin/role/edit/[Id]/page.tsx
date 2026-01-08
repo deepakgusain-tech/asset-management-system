@@ -1,32 +1,29 @@
+import Roleform from '@/components/USer/role-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { getRoleById } from '@/lib/actions/role-action'
 import Link from 'next/link'
 import React from 'react'
-import DeviceAssignedTable from './device-assigned-table'
-// import ModuleTable from './module-table'
 
+const EditRolePage = async ({ params }: { params: Promise<{ id: string }> }) => {
+    const { id } = await params;
 
-
-import { getModules } from '@/lib/actions/module-action'
-
-const ModulePage = async () => {
-    const module = await getModules();
+    const res = await getRoleById(id)
 
     return (
         <Card>
             <CardHeader>
                 <div className='flex justify-between items-center'>
-                    <h1>Module</h1>
+                    <h1>Edit Role</h1>
                     <Button variant="default" className='bg-blue-500 hover:bg-blue-600'>
-                        <Link href="device-assigned/create">Add Module</Link>
+                        <Link href="/admin/role">Back</Link>
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent className='w-full'>
-                <DeviceAssigned Table data={DeviceAssigned} />
+            <CardContent>
+                <Roleform data={res.data} update={true} />
             </CardContent>
         </Card>
     )
 }
-
-export default ModulePage
+export default EditRolePage

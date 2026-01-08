@@ -4,19 +4,21 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { deleteDepartment } from '@/lib/actions/department';
 import { getAssignedDevices } from '@/lib/actions/device-assigned-action';
-import { getModules } from '@/lib/actions/module-action';
+import { deleteModule, getModules } from '@/lib/actions/module-action';
 import { Device, DeviceAssigned, Employee, Module } from '@/types'
 import { EditIcon, Trash } from 'lucide-react';
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner';
 
-const ModuleTable = ({ data }: { data: Module[]}) => {
+const ModuleTable = ({  data , devices,
+    employees }: { data:  DeviceAssigned[], devices: Device[],
+    employees: Employee[]}) => {
 
-    const [assignedDevice, setAssignedDevice] = useState<Module[]>(data)
+    const [assignedDevice, setAssignedDevice] = useState<DeviceAssigned[]>(data)
 
     const deleteDeviceAssignedHandler = async (id: any) => {
-        let res = await deleteModu(id);
+        let res = await deleteModule(id);
 
         if (!res?.success) {
             toast.error("Error", {
@@ -43,7 +45,7 @@ const ModuleTable = ({ data }: { data: Module[]}) => {
                     <TableHead>Status</TableHead>
                     <TableHead>CreatedAt</TableHead>
                     <TableHead>Action</TableHead>
-                </TableRow>
+                 </TableRow>
             </TableHeader>
             <TableBody>
                 {assignedDevice && assignedDevice.length > 0 && assignedDevice.map((deviceAssigned) => (
