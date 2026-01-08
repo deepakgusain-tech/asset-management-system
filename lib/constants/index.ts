@@ -7,7 +7,7 @@ export const SERVER_URL = process.env.NEXT_APP_SERVER_URL ?? "http://localhost:3
 export const roleDefaultValues = {
     name: "",
     description: "",
-    status: false
+    status: Status.INACTIVE
 }
 
 export const userDefaultValues = {
@@ -16,14 +16,14 @@ export const userDefaultValues = {
     image: "",
     password: "",
     role: 0,
-    status: false
+    status: Status.ACTIVE
 }
 
 export const moduleDefaultValues = {
     name: "",
     description: "",
     role: "",
-    status: false
+    status: Status.ACTIVE
 }
 
 export const deviceCategoryDefaultValues = {

@@ -5,7 +5,7 @@ export const statusEnum = z.enum(["ACTIVE", "INACTIVE"])
 
 // user schema
 export const userSchema = z.object({
-    id: z.string().min(1, "User id is required"),
+    id: z.string().optional(),
     name: z.string().min(1, "User name is required"),
     email: z.email().min(1, "User email is required"),
     image: z.string().min(1, "User image is required"),
@@ -18,12 +18,12 @@ export const userSchema = z.object({
 
 // role schema
 export const roleSchema = z.object({
-    id: z.string().min(1, "Role id is required"),
+    id: z.string().optional(),
     name: z.string().min(1, "Role name is required"),
     description: z.string().min(1, "Role description is required"),
     status: z.enum(Object.values(Status)),
-    createdAt: z.date().nullable(),
-    updatedAt: z.date().nullable()
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional()
 })
 
 // module schema 
@@ -33,8 +33,8 @@ export const moduleSchema = z.object({
     description: z.string().min(1, "Role description is required"),
     roleId: z.string(),
     status: z.enum(Object.values(Status)),
-    createdAt: z.date().nullable(),
-    updatedAt: z.date().nullable()
+    createdAt: z.date().nullable().optional(),
+    updatedAt: z.date().nullable().optional()
 })
 
 // deviceCategory schema
