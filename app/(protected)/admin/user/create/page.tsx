@@ -1,27 +1,28 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import UserForm from '@/components/user/user-form'
+import { getRoles } from '@/lib/actions/role-action'
 import Link from 'next/link'
-import { getModules } from '@/lib/actions/module-action'
-import ModuleTable from './module-table'
+import React from 'react'
 
-const ModulePage = async () => {
-    const modules = await getModules();
+const UserCreatePage = async() => {
+    const roles = await getRoles()
 
     return (
         <Card>
             <CardHeader>
                 <div className='flex justify-between items-center'>
-                    <h1>Module</h1>
+                    <h1>Add Role</h1>
                     <Button variant="default" className='bg-blue-500 hover:bg-blue-600'>
-                        <Link href="module/create">Add Module</Link>
+                        <Link href="/admin/role">Back</Link>
                     </Button>
                 </div>
             </CardHeader>
-            <CardContent className='w-full'>
-                <ModuleTable data={modules} />
+            <CardContent>
+                <UserForm update={false} roles={roles} />
             </CardContent>
         </Card>
     )
 }
 
-export default ModulePage
+export default UserCreatePage
