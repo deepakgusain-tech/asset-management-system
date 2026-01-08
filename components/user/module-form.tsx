@@ -83,20 +83,26 @@ const ModuleForm = ({ data, update = false , roles }: { data?: Module, update: b
                                 field: ControllerRenderProps<z.infer<typeof moduleSchema>, "roleId">
                             }) => (
                                 <FormItem>
-                                    <FormLabel>Status</FormLabel>
+                                    <FormLabel>Role</FormLabel>
                                     <FormControl>
                                         <Select
                                             defaultValue={field.value}
-                                            onValueChange={(v) => field.onChange(v as Status)}
+                                            // onValueChange={(v) => field.onChange(v as Status)}
+                                            onValueChange={field.onChange}
                                         >
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Role" />
                                             </SelectTrigger>
+                                            
                                             <SelectContent>
                                             {
                                                 roles.length > 0 && roles.map((role, index) => (
                                                    role.id && <SelectItem value={role.id} key={index}>{role.name}</SelectItem>
                                                 ))
+                                                // roles.map(()=>( role.id &&
+                                                //     <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
+
+                                                // ))
                                             }
                                                 
                                             </SelectContent>
@@ -150,7 +156,7 @@ const ModuleForm = ({ data, update = false , roles }: { data?: Module, update: b
                             <FormItem>
                                 <FormLabel>Description</FormLabel>
                                 <FormControl>
-                                    <Textarea rows={20} className='h-40' placeholder='Enter name' {...field} />
+                                    <Textarea rows={20} className='h-40' placeholder='Enter description' {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
