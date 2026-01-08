@@ -99,10 +99,7 @@ const ModuleForm = ({ data, update = false , roles }: { data?: Module, update: b
                                                 roles.length > 0 && roles.map((role, index) => (
                                                    role.id && <SelectItem value={role.id} key={index}>{role.name}</SelectItem>
                                                 ))
-                                                // roles.map(()=>( role.id &&
-                                                //     <SelectItem key={role.id} value={role.id}>{role.name}</SelectItem>
-
-                                                // ))
+                                                
                                             }
                                                 
                                             </SelectContent>

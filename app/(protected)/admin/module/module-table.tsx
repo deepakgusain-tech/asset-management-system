@@ -46,8 +46,8 @@ const ModuleTable = ({ data }: { data: Module[] }) => {
                 {modules && modules.length > 0 && modules.map((module) => (
                     <TableRow key={module.id}>
                         <TableCell>{module.name}</TableCell>
-                        {/* <TableCell>{module.roleId ? module.roleId.name :"-"}</TableCell> */}
-                        <TableCell>{module.role ?.name ??"-"}</TableCell>
+                        {/* <TableCell>{module.roleId ? module.roleId:"-"}</TableCell> */}
+                         <TableCell>{module.role?.name ??"-"}</TableCell>
                         <TableCell>{module.status === "ACTIVE" ? <Badge variant="default" className='bg-green-500' >{module.status}</Badge> : <Badge variant="destructive" >{module.status}</Badge>}</TableCell>
                         <TableCell>{module.createdAt?.toLocaleString()}</TableCell>
                         <TableCell className='space-x-2'>
