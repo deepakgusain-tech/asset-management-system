@@ -3,15 +3,14 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { deleteRole, getRoles } from '@/lib/actions/role-action';
 import { deleteUser, getUsers } from '@/lib/actions/user-action';
-import { Role, User } from '@/types'
+import {  User } from '@/types'
 import { EditIcon, Trash } from 'lucide-react';
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner';
 
-const RoleTable = ({ data }: { data: User[]}) => {
+const UserTable = ({ data }: { data: User[]}) => {
 
     const [users, setUsers] = useState<User[]>(data)
 
@@ -45,26 +44,54 @@ const RoleTable = ({ data }: { data: User[]}) => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {users && users.length > 0 && users.map((user) => (
-                    <TableRow key={user.id}>
-                        <TableCell>{user.name}</TableCell>
-                          <TableCell>{user.status === "ACTIVE" ? <Badge variant="default" className='bg-green-500' >{user.status}</Badge> : <Badge variant="destructive" >{user.status}</Badge>}</TableCell>
-                        <TableCell>{user.createdAt?.toLocaleString()}</TableCell>
-                        <TableCell className='space-x-2'>
-                            <Button asChild variant="default" className='bg-orange-500 hover:bg-orange-600'>
-                                <Link href={`/admin/user/edit/${user.id}`}>
-                                    <EditIcon />
-                                </Link>
-                            </Button>
-                            <Button variant="destructive" className='cursor-pointer' onClick={() => deleteUserHandler(user.id)}>
-                                <Trash />
-                            </Button>
-                        </TableCell>
-                    </TableRow>
-                ))}
+              {users.map((user) => (
+                <TableRow key={user.id}>
+
+                  {/* Image column — intentionally blank */}
+                  <TableCell></TableCell>
+
+                  <TableCell>{user.name}</TableCell>
+
+                  <TableCell>{user.email}</TableCell>
+
+                  <TableCell>
+                    {user.status === "ACTIVE" ? (
+                      <Badge className="bg-green-500">ACTIVE</Badge>
+                    ) : (
+                      <Badge variant="destructive">INACTIVE</Badge>
+                    )}
+                  </TableCell>
+
+                  <TableCell>
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleString()
+                      : "-"}
+                  </TableCell>
+
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button asChild size="icon" className="bg-orange-500 hover:bg-orange-600">
+                        <Link href={`/admin/user/edit/${user.id}`}>
+                         <EditIcon size={16} />
+                        </Link>
+                      </Button>
+
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        onClick={() => deleteUserHandler(user.id)}
+                      >
+                        <Trash size={16} />
+                      </Button>
+                    </div>
+                  </TableCell>
+
+                </TableRow>
+             ))}
             </TableBody>
+
         </Table>
     )
 }
 
-export default RoleTable
+export default UserTable

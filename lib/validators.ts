@@ -8,7 +8,11 @@ export const userSchema = z.object({
     id: z.string().optional(),
     name: z.string().min(1, "User name is required"),
     email: z.email().min(1, "User email is required"),
-    image: z.string().min(1, "User image is required"),
+   // image: z.string().min(6, "User image is required").optional(),
+    image: z.union([
+    z.instanceof(File),
+    z.string().nullable(),
+  ]).optional(),
     password: z.string().min(1, "User password is required"),
     status: z.enum(Object.values(Status)),
     roleId: z.string(),
