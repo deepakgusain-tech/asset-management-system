@@ -42,6 +42,7 @@ const ModuleTable = ({ data }: { data: Module[] }) => {
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
+          <TableHead>Role</TableHead>
           <TableHead>Status</TableHead>
           <TableHead>CreatedAt</TableHead>
           <TableHead>Action</TableHead>
@@ -53,6 +54,7 @@ const ModuleTable = ({ data }: { data: Module[] }) => {
           modules.map((module) => (
             <TableRow key={module.id}>
               <TableCell>{module.name}</TableCell>
+              <TableCell>{module.role?.name}</TableCell>
               <TableCell>
                 {module.status === "ACTIVE" ? (
                   <Badge variant="default" className="bg-green-500">

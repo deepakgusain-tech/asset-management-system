@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/sidebar"
 import Link from "next/link"
 import React from "react"
+import { Item } from "@radix-ui/react-dropdown-menu"
+ 
 
 export function NavMain({
   items,
@@ -28,25 +30,45 @@ export function NavMain({
     url: string
     icon?: LucideIcon
     isActive?: boolean
+    role?: string; // add new
     items?: {
       title: string
       url: string
       icon?: LucideIcon
+      role?: string;   // add new
     }[]
   }[]
-}) {
+}) 
+{
+
+  const role = 'employee';    //add new
+
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Menus</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item, index) => (
+        {/* {items.map((item, index) => (
           <React.Fragment key={index}>
             {item.items && item.items.length > 0 ? (<Collapsible
               key={index}
               asChild
               defaultOpen={item.isActive}
               className="group/collapsible"
-            >
+            > */}
+
+                {items
+          // Step 2: filter main items based on role
+          .filter((item) => !item.role || item.role === role)
+          .map((item, index) => (
+            <React.Fragment key={index}>
+              {item.items && item.items.length > 0 ? (
+                <Collapsible
+                  asChild
+                  defaultOpen={item.isActive}
+                  className="group/collapsible"
+                >
+
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title}>
@@ -57,8 +79,23 @@ export function NavMain({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items && item.items?.length > 0 && item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
+                    {/* {item.items && item.items?.length > 0 && item.items?.map((subItem) => ( */}
+                    {item.items
+                    .filter((sub) => !sub.role || sub.role === role)
+                    .map((subItem) =>(
+                       <SidebarMenuSubItem key={subItem.title}>
+                              <SidebarMenuSubButton asChild>
+                                <Link href={subItem.url}>
+                                  {subItem.icon && (
+                                    <subItem.icon className="w-4 h-4" />
+                                  )}
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                    
+                      {/* <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
                           <Link href={subItem.url}>
                             {subItem.icon && <subItem.icon className="w-4 h-4" />}
@@ -67,7 +104,7 @@ export function NavMain({
                           </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
-                    ))}
+                    ))} */}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>
@@ -88,3 +125,7 @@ export function NavMain({
     </SidebarGroup>
   )
 }
+
+
+
+
