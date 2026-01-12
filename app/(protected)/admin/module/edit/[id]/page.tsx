@@ -17,7 +17,7 @@ const ModuleEditPage = async ({ params }: { params: Promise<{ id: string }> }) =
                 <div className='flex justify-between items-center'>
                     <h1>Edit Module</h1>
                     <Button variant="default" className='bg-blue-500 hover:bg-blue-600'>
-                        <Link href="/admin/device-assigned">Back</Link>
+                        <Link href="/admin/module">Back</Link>
                     </Button>
                 </div>
             </CardHeader>
