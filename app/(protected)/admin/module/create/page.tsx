@@ -1,16 +1,14 @@
 import DeviceAssignedForm from '@/components/device/assigned-device-form'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { getDevice } from '@/lib/actions/device-action'
-import { getEmployee } from '@/lib/actions/employee'
-import { Device, Employee } from '@/types'
+import ModuleForm from '@/components/user/module-form'
+import { getRoles } from '@/lib/actions/role-action'
 import Link from 'next/link'
 import React from 'react'
 
-const DepartmentCreate = async() => {
-    const devices = await getDevice();
-    const empoloyees = await getEmployee();
-
+const ModuleCreate = async() => {
+    const roles = await getRoles();
+   
     return (
         <Card>
             <CardHeader>
@@ -22,7 +20,7 @@ const DepartmentCreate = async() => {
                 </div>
             </CardHeader>
             <CardContent>
-                <DeviceAssignedForm update={false} devices={devices as Device[]} employees={empoloyees as Employee[]} />
+                <ModuleForm update={false} roles={roles} />
             </CardContent>
         </Card>
     )

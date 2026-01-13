@@ -1,10 +1,8 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import Link from 'next/link'
-import React from 'react'
-import DeviceAssignedTable from './device-assigned-table'
-
 import { getModules } from '@/lib/actions/module-action'
+import ModuleTable from './module-table'
 
 const ModulePage = async () => {
     const modules = await getModules();
@@ -20,7 +18,7 @@ const ModulePage = async () => {
                 </div>
             </CardHeader>
             <CardContent className='w-full'>
-                <DeviceAssignedTable data={deviceAssigned} />
+                <ModuleTable data={modules} />
             </CardContent>
         </Card>
     )

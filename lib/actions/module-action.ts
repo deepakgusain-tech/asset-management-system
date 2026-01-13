@@ -6,7 +6,13 @@ import { formatError } from "../utils";
 import { moduleSchema } from "../validators";
 
 export async function getModules() {
-   return await prisma.module.findMany()
+   //return await prisma.module.findMany()
+   const modules = await prisma.module.findMany({
+    include: {
+      role: true, // include the related role
+    },
+  });
+  return modules;
 }
 
 // create module
