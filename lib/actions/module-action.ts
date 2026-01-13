@@ -26,7 +26,7 @@ export async function createModule(data: Module) {
             name: module.name,
             description: module.description,
             status: module.status,
-            roleId: module.roleId
+            roleId: module.role
          }
       })
 
@@ -84,7 +84,7 @@ export async function updateModule(data: Module, id: string) {
             name: module.name,
             description: module.description,
             status: module.status,
-            roleId: module.roleId
+            roleId: module.role
          }
       })
 

@@ -35,9 +35,9 @@ export const moduleSchema = z.object({
     id: z.string().optional(),
     name: z.string().min(1, "Role name is required"),
     description: z.string().min(1, "Role description is required"),
-    roleId: z.string(),
+    role: z.string(),
     status: z.enum(Object.values(Status)),
-    createdAt: z.date().nullable().optional(),
+   createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })
 

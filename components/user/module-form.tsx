@@ -107,31 +107,31 @@ const ModuleForm = ({
           <div className="flex flex-col gap-5">
             <FormField
               control={form.control}
-              name="roleId"
+              name="role"
               render={({
                 field,
               }: {
                 field: ControllerRenderProps<
                   z.infer<typeof moduleSchema>,
-                  "roleId"
+                  "role"
                 >;
               }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
 
                       <SelectContent>
                         {roles.map(
-                          (role) =>
+                          (role : any) =>
                             role.id && (
                               <SelectItem key={role.id} value={role.id}>
                                 {role.name}
                               </SelectItem>
-                            )
+                            ) 
                         )}
                       </SelectContent>
                     </Select>

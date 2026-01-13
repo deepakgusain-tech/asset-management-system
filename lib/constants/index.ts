@@ -22,7 +22,8 @@ export const userDefaultValues = {
 export const moduleDefaultValues = {
     name: "",
     description: "",
-    role: "",
+    //role: "",
+    roleId:"",
     status: Status.ACTIVE
 }
 
