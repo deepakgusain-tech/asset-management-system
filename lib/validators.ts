@@ -33,6 +33,11 @@ export const moduleSchema = z.object({
     description: z.string().min(1, "Role description is required"),
     roleId: z.string(),
     status: z.enum(Object.values(Status)),
+    role:z.object({
+        id: z.string(),
+        name: z.string(),
+    })
+    .optional(),
     createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })
