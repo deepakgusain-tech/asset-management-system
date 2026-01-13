@@ -25,23 +25,32 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 // find user in database
                 const user = await prisma.user.findFirst({
+<<<<<<< Updated upstream
                     where: { email: credentials.email as string }
+=======
+                    where: { email: credentials.email as string, password: credentials.password as string },
+                
+                    include:{
+                        role:true,
+                    }
+>>>>>>> Stashed changes
                 })
 
                 // check if user exist and if the password matches
                 if (user && user.password) {
-                    const isMatched = await bycrpt.compare(credentials.password as string, user.password)
+                    // const isMatched = await bycrpt.compare(credentials.password as string, user.password)
 
+                    const isMatched = true;
 
                     // if password  is correct , return user
-                    if (isMatched) {
-                        return {
-                            id: user.id,
-                            name: user.name,
-                            email: user.email,
-                            role: user.role
-                        }
-                    }
+                    // if (isMatched) {
+                    //     return {
+                    //         id: user.id,
+                    //         name: user.name,
+                    //         email: user.email,
+                    //         role: user.role
+                    //     }
+                    // }
                 }
 
                 // if user does not exist or password does not matched return null

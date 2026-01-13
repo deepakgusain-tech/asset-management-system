@@ -5,6 +5,7 @@ import { User } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { userSchema } from "../validators";
 import { formatError } from "../utils";
+import bcrypt from 'bcrypt';
 
 
 export async function getUsers() {
@@ -133,3 +134,39 @@ export async function deleteUser(id: any) {
       }
    }
 }
+
+
+//login or Sign-in User
+
+export async function loginUser(email: string, password: string){
+   const user =await prisma.user.findUnique({
+      where:{email, password}
+   })
+
+   if (!user) {
+      return {
+        success: false,
+        message: "Invalid email or password"
+      }
+    }
+
+   //  const isPasswordValid = await bcrypt.compare(password, user.password)
+
+   //  if (!isPasswordValid) {
+   //    return {
+   //      success: false,
+   //      message: "Invalid email or password"
+   //    }
+   //  }
+
+    return {
+      success: true,
+      message: "Login successful",
+      data: {
+        id: user.id,
+        email: user.email,
+        roleId: user.roleId,
+      }
+    }
+}
+

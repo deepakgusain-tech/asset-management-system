@@ -1,3 +1,7 @@
+// "use client"
+
+import { loginUser } from "@/lib/actions/user-action"
+import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -7,7 +11,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { APP_NAME } from "@/lib/constants"
+import { APP_NAME } from "@/lib/constants/"
 import Image from "next/image"
 import Banner from "@/assets/images/asset-management-software.png"
 
@@ -15,6 +19,24 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+  const router = useRouter()
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+
+    const res = await loginUser(email, password)
+
+    if (res.success) {
+      router.push("/admin/dashboard")
+    } else {
+      alert(res.message)
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
@@ -49,8 +71,8 @@ export function LoginForm({
           </form>
           <div className="bg-muted relative hidden md:block">
             <Image
-              height={1000}
-              width={1000}
+               height={1000}
+               width={1000}
               src={Banner}
               alt={APP_NAME}
               className="absolute inset-0 h-full w-full"

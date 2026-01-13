@@ -11,6 +11,8 @@ import { useState } from 'react'
 import { toast } from 'sonner';
 
 const UserTable = ({ data }: { data: User[]}) => {
+  console.log(data);
+  
 
     const [users, setUsers] = useState<User[]>(data)
 
