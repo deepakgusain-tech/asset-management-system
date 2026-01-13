@@ -1,25 +1,34 @@
 "use server";
 
+import { z } from "zod";
 import { User } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { userSchema } from "../validators";
 import { formatError } from "../utils";
+
 
 export async function getUsers() {
    return await prisma.user.findMany()
 }
 
 // create user
-export async function createUser(data: User) {
+export async function createUser(data: z.infer<typeof userSchema>) {
+
 
    try {
       const user = userSchema.parse(data)
+
+      const imageValue =
+      user.image instanceof File
+        ? user.image.name        // convert File → string
+        : user.image ?? null     // allow string or null
+
 
       await prisma.user.create({
          data: {
             name: user.name,
             email: user.email,
-            image: user.image,
+            image: imageValue,
             password: user.password,
             status: user.status,
             roleId: user.roleId,
@@ -74,12 +83,18 @@ export async function updateUser(data: User, id: string) {
 
       const user = userSchema.parse(data)
 
+       const imageValue =
+      user.image instanceof File
+        ? user.image.name        // convert File → string
+        : user.image ?? null     // allow string or null
+
+
       await prisma.user.update({
          where: { id },
          data: {
             name: user.name,
             email: user.email,
-            image: user.image,
+            image:  imageValue,
             password: user.password,
             status: user.status,
             roleId: user.roleId,

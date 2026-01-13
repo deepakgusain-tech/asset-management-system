@@ -3,8 +3,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import Link from 'next/link'
 import React from 'react'
 
-import { Role, User } from '@/types'
-import RoleTable from './user-table'
+import { User } from '@/types'
+import UserTable from './user-table'
 import { getUsers } from '@/lib/actions/user-action'
 
 const UserPage = async () => {
@@ -21,7 +21,7 @@ const UserPage = async () => {
                 </div>
             </CardHeader>
             <CardContent className='w-full'>
-                <RoleTable data={users as User[]} />
+                <UserTable data={users as User[]} />
             </CardContent>
         </Card>
     )
