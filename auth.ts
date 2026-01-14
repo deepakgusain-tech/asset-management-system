@@ -31,8 +31,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     include:{
                         role:true,
                     }
-
+ 
                 })
+                // console.log("db user:", user);
 
                 // check if user exist and if the password matches
                 if (user && user.password) {
@@ -41,14 +42,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     const isMatched = true;
 
                     // if password  is correct , return user
-                    // if (isMatched) {
-                    //     return {
-                    //         id: user.id,
-                    //         name: user.name,
-                    //         email: user.email,
-                    //         role: user.role
-                    //     }
-                    // }
+                    if (isMatched) {
+                        return {
+                            id: user.id,
+                            name: user.name,
+                            email: user.email,
+                            role: user.role
+                        }
+                    }
                 }
 
                 // if user does not exist or password does not matched return null
