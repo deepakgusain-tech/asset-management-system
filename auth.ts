@@ -25,15 +25,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 // find user in database
                 const user = await prisma.user.findFirst({
-<<<<<<< Updated upstream
-                    where: { email: credentials.email as string }
-=======
+                    
                     where: { email: credentials.email as string, password: credentials.password as string },
                 
                     include:{
                         role:true,
                     }
->>>>>>> Stashed changes
+
                 })
 
                 // check if user exist and if the password matches
