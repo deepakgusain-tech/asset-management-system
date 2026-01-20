@@ -5,6 +5,7 @@ import {
   AudioWaveform,
   BookOpen,
   Bot,
+  Building2,
   BuildingIcon,
   Command,
   ComputerIcon,
@@ -75,6 +76,11 @@ const data = {
           title: "Device Assigned",
           url: "/admin/device-assigned",
           icon: UserPlus,
+        },
+        {
+          title: "Vendor",
+          url: "/admin/vendor",
+          icon: Building2,
         },
       ]
     },

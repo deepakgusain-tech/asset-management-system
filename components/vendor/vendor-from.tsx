@@ -1,340 +1,209 @@
-// "use client";
 
-// import React from "react";
-// import { ControllerRenderProps, useForm } from "react-hook-form";
-// import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-// import { Input } from "../ui/input";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-// import { Button } from "../ui/button";
-// import { ArrowRight, Loader } from "lucide-react";
-// import { toast } from "sonner";
+"use client";
 
-// // Dummy types for UI-only
-// export interface VendorType {
+import React from "react";
+import z from "zod";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ControllerRenderProps, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+import { vendorSchema } from "@/lib/validators"; 
+import { vendorDefaultValues } from "@/lib/constants";
+import { createVendor, updateVendor } from "@/lib/actions/vendor-action";
+import { Status } from "@/lib/generated/prisma/enums";
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Loader } from "lucide-react";
+
+// type VendorType = {
 //   id: string;
 //   name: string;
-// }
-
-// export interface Vendor {
-//   id?: string;
-//   name: string;
-//   email?: string;
-//   phoneNumber?: string;
-//   vendorTypeId?: string;
-//   address?: string;
-//   status: "ACTIVE" | "INACTIVE";
-// }
-
-// // Dummy default values
-// export const vendorDefaultValues: Vendor = {
-//   name: "",
-//   email: "",
-//   phoneNumber: "",
-//   vendorTypeId: undefined,
-//   address: "",
-//   status: "ACTIVE",
 // };
 
-// interface VendorFormProps {
-//   data?: Vendor;
-//   update?: boolean;
+type VendorFormProps = {
+  data?: any;
+  update?: boolean;
 //   vendorTypes: VendorType[];
-//    onSubmit?: (values: Vendor) => void; // ✅ add this optional prop
-// }
+};
 
-// const VendorForm = ({ data, update = false, vendorTypes }: VendorFormProps) => {
-//   const form = useForm<Vendor>({
-//     defaultValues: data || vendorDefaultValues,
-//   });
+const VendorForm = ({
+  data,
+  update = false,
+//   vendorTypes,
+}: VendorFormProps) => {
+  const router = useRouter();
+  const id = data?.id;
 
-//   const [isPending, startTransition] = React.useTransition();
+  const form = useForm<z.infer<typeof vendorSchema>>({
+    resolver: zodResolver(vendorSchema),
+    defaultValues: data || vendorDefaultValues,
+  });
 
-//   const handleSubmit = (values: Vendor) => {
-//     startTransition(() => {
-//       console.log("Vendor Form Submitted (UI-only):", values);
-//       toast.success("Vendor form submitted (UI-only)!");
-//     });
-//   };
+  const [isPending, startTransition] = React.useTransition();
 
-//   return (
-//     <Form {...form}>
-//       <form
-//         className="space-y-4 grid grid-cols-2 gap-4"
-//         onSubmit={form.handleSubmit(handleSubmit)}
-//       >
-//         {/* Vendor Name */}
-//         <FormField
-//           control={form.control}
-//           name="name"
-//           render={({ field }: { field: ControllerRenderProps<Vendor, "name"> }) => (
-//             <FormItem>
-//               <FormLabel>Name</FormLabel>
-//               <FormControl>
-//                 <Input placeholder="Enter Vendor Name" {...field} />
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
+  const onSubmit: SubmitHandler<z.infer<typeof vendorSchema>> = async (
+    values
+  ) => {
+    startTransition(async () => {
+      let res;
 
-//         {/* Vendor Email */}
-//         <FormField
-//           control={form.control}
-//           name="email"
-//           render={({ field }: { field: ControllerRenderProps<Vendor, "email"> }) => (
-//             <FormItem>
-//               <FormLabel>Email</FormLabel>
-//               <FormControl>
-//                 <Input placeholder="Enter Email" {...field} />
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
+      if (update && id) {
+        res = await updateVendor(values, id);
+      } else {
+        res = await createVendor(values);
+      }
 
-//         {/* Vendor Phone */}
-//         <FormField
-//           control={form.control}
-//           name="phoneNumber"
-//           render={({ field }: { field: ControllerRenderProps<Vendor, "phoneNumber"> }) => (
-//             <FormItem>
-//               <FormLabel>Phone Number</FormLabel>
-//               <FormControl>
-//                 <Input placeholder="Enter Phone Number" {...field} />
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
+      if (!res?.success) {
+        toast.error("Error", { description: res?.message });
+      } else {
+        toast.success("Success", { description: res?.message });
+        router.push("/admin/vendor");
+      }
+    });
+  };
 
-//         {/* Vendor Type */}
-//         <FormField
-//           control={form.control}
-//           name="vendorTypeId"
-//           render={({ field }: { field: ControllerRenderProps<Vendor, "vendorTypeId"> }) => (
-//             <FormItem>
-//               <FormLabel>Vendor Type</FormLabel>
-//               <FormControl>
-//                 <Select defaultValue={field.value} onValueChange={(v) => field.onChange(v)}>
-//                   <SelectTrigger className="w-full">
-//                     <SelectValue placeholder="Select Vendor Type" />
-//                   </SelectTrigger>
-//                   <SelectContent>
-//                     {vendorTypes.map((type) => (
-//                       <SelectItem key={type.id} value={type.id}>
-//                         {type.name}
-//                       </SelectItem>
-//                     ))}
-//                   </SelectContent>
-//                 </Select>
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-4"
+      >
+        {/* <div className="grid grid-cols-2 gap-4"> */}
+    
+          {/* Name */}
+          <div className='flex flex-col gap-5'>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Vendor name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          </div>
 
-//         {/* Address (spans two columns) */}
-//         <FormField
-//           control={form.control}
-//           name="address"
-//           render={({ field }: { field: ControllerRenderProps<Vendor, "address"> }) => (
-//             <FormItem className="col-span-2">
-//               <FormLabel>Address</FormLabel>
-//               <FormControl>
-//                 <Input placeholder="Enter Address" {...field} />
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
+          {/* Email */}
+          <div className='flex flex-col gap-5'>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({
+              field,
+            }: {
+              field: ControllerRenderProps<
+                z.infer<typeof vendorSchema>,
+                "email"
+              >;
+            }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="Vendor email" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          </div>
 
-//         {/* Status */}
-//         <FormField
-//           control={form.control}
-//           name="status"
-//           render={({ field }: { field: ControllerRenderProps<Vendor, "status"> }) => (
-//             <FormItem>
-//               <FormLabel>Status</FormLabel>
-//               <FormControl>
-//                 <Select defaultValue={field.value} onValueChange={(v) => field.onChange(v as "ACTIVE" | "INACTIVE")}>
-//                   <SelectTrigger className="w-full">
-//                     <SelectValue placeholder="Select Status" />
-//                   </SelectTrigger>
-//                   <SelectContent>
-//                     <SelectItem value="ACTIVE">Active</SelectItem>
-//                     <SelectItem value="INACTIVE">Inactive</SelectItem>
-//                   </SelectContent>
-//                 </Select>
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
+          {/* Phone */}
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone</FormLabel>
+                <FormControl>
+                  <Input placeholder="Phone number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-//         {/* Submit Button */}
-//         <div className="flex gap-2 col-span-2">
-//           <Button type="submit" disabled={isPending}>
-//             {isPending ? <Loader className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />} Save
-//           </Button>
-//         </div>
-//       </form>
-//     </Form>
-//   );
-// };
+          {/* Address */}
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Address</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Vendor address" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-// export default VendorForm;
+          {/* Status */}
+          <div className='flex flex-col gap-5'>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <Select
+                    value={field.value}
+                    onValueChange={(v) =>
+                      field.onChange(v as Status)
+                    }
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={Status.ACTIVE}>Active</SelectItem>
+                      <SelectItem value={Status.INACTIVE}>Inactive</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
+             <div className="flex gap-2">
+                       <Button type="submit" className="cursor-pointer" disabled={isPending}>
+                         {isPending ? (
+                           <Loader className="w-4 h-4 animate-spin cursor-pointer" />
+                         ) : (
+                           <ArrowRight className="w-4 h-4" />
+                         )}{" "}
+                         Save
+                       </Button> 
+                      
+                       </div>
 
+       </form>
+    </Form>
+  );
+};
 
-
-
-
-
-
-// "use client";
-
-// import React from "react";
-// import { useForm, Controller } from "react-hook-form";
-// import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
-// import { Input } from "../ui/input";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-// import { Button } from "../ui/button";
-// import { ArrowRight, Loader } from "lucide-react";
-
-// const VendorForm = () => {
-//   const form = useForm(); // no default values
-
-//   const [isPending, startTransition] = React.useTransition();
-
-//   // UI-only submit handler does nothing
-//   const handleSubmit = () => {
-//     startTransition(() => {
-//       // Purely UI: no action
-//     });
-//   };
-
-//   return (
-//     <Form {...form}>
-//       <form
-//         className="space-y-4 grid grid-cols-2 gap-4"
-//         onSubmit={form.handleSubmit(handleSubmit)}
-//       >
-//         {/* Vendor Name */}
-//         <FormField
-//           control={form.control}
-//           name="name"
-//           render={({ field }) => (
-//             <FormItem>
-//               <FormLabel>Name</FormLabel>
-//               <FormControl>
-//                 <Input placeholder="Enter Vendor Name" {...field} />
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
-
-//         {/* Vendor Email */}
-//         <FormField
-//           control={form.control}
-//           name="email"
-//           render={({ field }) => (
-//             <FormItem>
-//               <FormLabel>Email</FormLabel>
-//               <FormControl>
-//                 <Input placeholder="Enter Email" {...field} />
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
-
-//         {/* Vendor Phone */}
-//         <FormField
-//           control={form.control}
-//           name="phoneNumber"
-//           render={({ field }) => (
-//             <FormItem>
-//               <FormLabel>Phone Number</FormLabel>
-//               <FormControl>
-//                 <Input placeholder="Enter Phone Number" {...field} />
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
-
-//         {/* Vendor Type */}
-//         <FormField
-//           control={form.control}
-//           name="vendorTypeId"
-//           render={({ field }) => (
-//             <FormItem>
-//               <FormLabel>Vendor Type</FormLabel>
-//               <FormControl>
-//                 <Select onValueChange={(v) => field.onChange(v)}>
-//                   <SelectTrigger className="w-full">
-//                     <SelectValue placeholder="Select Vendor Type" />
-//                   </SelectTrigger>
-//                   <SelectContent>
-//                     {/* No options, purely UI */}
-//                   </SelectContent>
-//                 </Select>
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
-
-//         {/* Address (spans two columns) */}
-//         <FormField
-//           control={form.control}
-//           name="address"
-//           render={({ field }) => (
-//             <FormItem className="col-span-2">
-//               <FormLabel>Address</FormLabel>
-//               <FormControl>
-//                 <Input placeholder="Enter Address" {...field} />
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
-
-//         {/* Status */}
-//         <FormField
-//           control={form.control}
-//           name="status"
-//           render={({ field }) => (
-//             <FormItem>
-//               <FormLabel>Status</FormLabel>
-//               <FormControl>
-//                 <Select onValueChange={(v) => field.onChange(v)}>
-//                   <SelectTrigger className="w-full">
-//                     <SelectValue placeholder="Select Status" />
-//                   </SelectTrigger>
-//                   <SelectContent>
-//                     <SelectItem value="ACTIVE">Active</SelectItem>
-//                     <SelectItem value="INACTIVE">Inactive</SelectItem>
-//                   </SelectContent>
-//                 </Select>
-//               </FormControl>
-//               <FormMessage />
-//             </FormItem>
-//           )}
-//         />
-
-//         {/* Submit Button */}
-//         <div className="flex gap-2 col-span-2">
-//           <Button type="submit" disabled={isPending}>
-//             {isPending ? <Loader className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />} Save
-//           </Button>
-//         </div>
-//       </form>
-//     </Form>
-//   );
-// };
-
-// export default VendorForm;
-
-
+export default VendorForm

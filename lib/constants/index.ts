@@ -84,3 +84,24 @@ export const assignedDeviceDefaultValues = {
     assignedDate: new Date(),
     returnedDate: new Date(),
 }
+
+
+
+// vendor
+
+
+
+// export const vendorTypeDefaultValues = {
+//   name: "",
+//   description: "",
+//   status: Status.ACTIVE,
+// };
+
+export const vendorDefaultValues = {
+  name: "",
+  email: "",
+  phoneNumber: "",
+  address: "",
+//   vendorTypeId: "",
+  status: Status.ACTIVE,
+};

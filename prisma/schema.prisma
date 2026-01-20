@@ -216,3 +216,20 @@ model DeviceAssigned {
   @@index([deviceId])
   @@index([employeeId])
 }
+
+// new code 
+model Vendor {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  email       String?
+  phoneNumber String?
+  address     String?
+
+  status Status @default(ACTIVE)
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  @@index([status])
+}
+
