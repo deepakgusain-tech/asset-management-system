@@ -131,18 +131,11 @@ export const deviceAssignedSchema = z.object({
 
 // vendor schema
 export const vendorSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Name is required"),
   email: z.string().min(1, "Vendor email is required"),
   phoneNumber: z.string().min(1, "Vendor phone number is required"),
   address: z.string().min(1,"Vendor address is required"),
-//   vendorTypeId: z.string().min(1, "Select Vendor Type"),
-  status: z.enum(["ACTIVE", "INACTIVE"]).default("INACTIVE"),
+  status: z.enum(["ACTIVE", "INACTIVE"]).default("INACTIVE").optional(),
 });
 
-
-
-// export const vendorTypeSchema = z.object({
-//   name: z.string().min(1, { message: "Name is required" }),
-//   description: z.string().optional(),
-//   status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
-// });
