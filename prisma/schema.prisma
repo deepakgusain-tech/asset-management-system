@@ -25,6 +25,11 @@ enum DeviceStatus {
   RETIRED
 }
 
+enum RQStatus {
+  DRAFT
+  SENT
+}
+
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -216,3 +221,36 @@ model DeviceAssigned {
   @@index([deviceId])
   @@index([employeeId])
 }
+<<<<<<< Updated upstream
+=======
+
+// new code 
+model Vendor {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  email       String?
+  phoneNumber String?
+  address     String?
+
+  status Status @default(ACTIVE)
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  @@index([status])
+}
+
+
+
+model RequestQuotation {
+  id          String   @id @default(uuid())
+
+  title       String
+  requirement String   // textarea: user writes full requirement here
+
+  status      RQStatus @default(DRAFT)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+>>>>>>> Stashed changes
