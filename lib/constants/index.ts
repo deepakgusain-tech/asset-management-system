@@ -83,4 +83,56 @@ export const assignedDeviceDefaultValues = {
     status: AssignedDeviceStatus.NOTASSIGNED,
     assignedDate: new Date(),
     returnedDate: new Date(),
+<<<<<<< Updated upstream
 }
+=======
+}
+
+
+export const vendorDefaultValues = {
+  name: "",
+  email: "",
+  phoneNumber: "",
+  address: "",
+  status: Status.ACTIVE,
+};
+
+
+
+// new changes 
+export const requestQuotationDefaultValues = {
+  title: "",
+  requirement: "", // textarea content
+  status: "DRAFT", // default status
+};
+
+export const vendorQuotationAttachmentDefaultValues = {
+  fileName: "",
+  fileUrl: "",
+  fileType: "PDF", // default type,  IMAGE or DOC
+  mimeType: null,
+  fileSize: null,
+}
+
+export const vendorQuotationItemDefaultValues = {
+  configuration: "",
+  unitPrice: 0,
+  quantity: 1,
+  discount: 0,
+  totalPrice: 0,
+  model: "",
+  serialNumber: "",
+  version: "",
+  attachments: [vendorQuotationAttachmentDefaultValues], // empty array if you want
+}
+
+export const vendorQuotationDefaultValues = {
+  vendorId: "",
+  rfqId: null,
+  status: "SUBMITTED", 
+  totalAmount: 0,
+  items: [vendorQuotationItemDefaultValues],
+}
+
+
+>>>>>>> Stashed changes
