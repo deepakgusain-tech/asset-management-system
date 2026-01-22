@@ -128,8 +128,7 @@ export const deviceAssignedSchema = z.object({
     createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 })
-<<<<<<< Updated upstream
-=======
+
 
 // vendor schema
 export const vendorSchema = z.object({
@@ -143,11 +142,11 @@ export const vendorSchema = z.object({
 
 //RFQ
 export const requestQuotationSchema = z.object({
-    id: z.string(),
+    id: z.string().optional(),
   title: z.string().min(3, "Title is required"),
-  requirement: z.string().min(10, "Requirement is required"),
+  requirement: z.string().trim().min(10, "Requirement is required"),
   status: z.enum(["DRAFT", "SENT"]).default("DRAFT"),
    createdAt: z.date().nullable().optional(),
     updatedAt: z.date().nullable().optional()
 });
->>>>>>> Stashed changes
+

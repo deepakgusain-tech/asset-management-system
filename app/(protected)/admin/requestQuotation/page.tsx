@@ -36,15 +36,13 @@ const RequestQuotationPage = () => {
           </Button>
         </div>
       </CardHeader>
-
       <CardContent className="w-full">
-        {loading ? (
-          <p>Loading...</p>
-        ) : requests.length > 0 ? (
-          <RequestQuotationTable data={requests} />
-        ) : (
-          <p>No Request Quotations found.</p>
-        )}
+        {!loading &&
+          (requests.length > 0 ? (
+            <RequestQuotationTable data={requests} />
+          ) : (
+            <p>No Request Quotations found.</p>
+          ))}
       </CardContent>
     </Card>
   );

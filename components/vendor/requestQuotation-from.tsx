@@ -78,9 +78,20 @@ const RequestQuotationForm = ({
     });
   };
 
+  
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+  <form
+  onSubmit={form.handleSubmit(
+    onSubmit,
+    (errors) => {
+      console.log( errors);
+    }
+  )}
+  className="space-y-4"
+>
+
         {/* Title */}
         <FormField
           control={form.control}

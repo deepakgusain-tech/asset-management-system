@@ -77,7 +77,7 @@ export const locationDefaultValues = {
 }
 
 export const assignedDeviceDefaultValues = {
-<<<<<<< Updated upstream
+
     deviceId: "",
     employeeId: "",
     remarks: "",
@@ -85,22 +85,7 @@ export const assignedDeviceDefaultValues = {
     assignedDate: new Date(),
     returnedDate: new Date(),
 }
-=======
-  deviceId: "",
-  employeeId: "",
-  remarks: "",
-  status: AssignedDeviceStatus.NOTASSIGNED,
-  assignedDate: new Date(),
-  returnedDate: new Date(),
-};
 
-// vendor
-
-// export const vendorTypeDefaultValues = {
-//   name: "",
-//   description: "",
-//   status: Status.ACTIVE,
-// };
 
 export const vendorDefaultValues = {
   name: "",
@@ -118,4 +103,4 @@ export const requestQuotationDefaultValues = {
   requirement: "", // textarea content
   status: "DRAFT", // default status
 };
->>>>>>> Stashed changes
+

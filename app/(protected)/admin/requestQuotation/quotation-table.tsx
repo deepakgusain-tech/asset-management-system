@@ -94,7 +94,10 @@ const RequestQuotationTable = ({ data }: Props) => {
                 <Button
                   size="icon"
                   variant="destructive"
-                  onClick={() => deleteHandler(rq.id)}
+                  onClick={() => {
+                    if (!rq.id) return;
+                    deleteHandler(rq.id);
+                  }}
                 >
                   <Trash size={16} />
                 </Button>

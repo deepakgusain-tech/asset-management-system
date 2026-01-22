@@ -7,14 +7,12 @@ import {
     moduleSchema,
     roleSchema,
     userSchema,
-<<<<<<< Updated upstream
-    deviceAssignedSchema
-=======
+
     deviceAssignedSchema,
     vendorSchema,
     requestQuotationSchema
     
->>>>>>> Stashed changes
+
 } from "@/lib/validators";
 
 import z from "zod";
@@ -30,8 +28,7 @@ export type Employee = z.infer<typeof employeeSchema>
 export type DeviceAssigned = z.infer<typeof deviceAssignedSchema>
 
 
-<<<<<<< Updated upstream
-=======
+
 // add new
 export type Vendor = z.infer<typeof vendorSchema>;
 // new RFQ type
@@ -39,4 +36,4 @@ export type RequestQuotation = z.infer<typeof requestQuotationSchema>;
 
 
 
->>>>>>> Stashed changes
+
