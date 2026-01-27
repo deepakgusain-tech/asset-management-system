@@ -25,6 +25,12 @@ enum DeviceStatus {
   RETIRED
 }
 
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  BLACKLISTED
+}
+
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -215,4 +221,29 @@ model DeviceAssigned {
 
   @@index([deviceId])
   @@index([employeeId])
+}
+
+model Vendor {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendorCode     String   @unique 
+  name           String   
+  contactPerson  String?  
+  phone          String?  
+  email          String?  
+  addressLine1   String?  
+  addressLine2   String?  
+  city           String?  
+  state          String?  
+  postalCode     String?  
+  country        String? 
+  taxId          String?  
+  website        String?  
+  status         VendorStatus @default(ACTIVE)
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations (optional but common)
+  // assets         Asset[]
+  // purchaseOrders PurchaseOrder[]
 }

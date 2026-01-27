@@ -104,7 +104,7 @@ const ModuleForm = ({
 
           {/*  Role   */}
 
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col">
             <FormField
               control={form.control}
               name="roleId"
@@ -119,8 +119,8 @@ const ModuleForm = ({
                 <FormItem>
                   <FormLabel>Role</FormLabel>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
+                    <Select   value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
 

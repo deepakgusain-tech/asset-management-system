@@ -5,6 +5,7 @@ import {
   AudioWaveform,
   BookOpen,
   Bot,
+  BriefcaseBusinessIcon,
   BuildingIcon,
   Command,
   ComputerIcon,
@@ -28,7 +29,6 @@ import {
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -75,6 +75,11 @@ const data = {
           title: "Device Assigned",
           url: "/admin/device-assigned",
           icon: UserPlus,
+        },
+        {
+          title: "Vendor",
+          url: "/admin/vendor",
+          icon: BriefcaseBusinessIcon,
         },
       ]
     },

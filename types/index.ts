@@ -7,7 +7,8 @@ import {
     moduleSchema,
     roleSchema,
     userSchema,
-    deviceAssignedSchema
+    deviceAssignedSchema,
+    vendorSchema
 } from "@/lib/validators";
 
 import z from "zod";
@@ -21,5 +22,7 @@ export type Department = z.infer<typeof departmentSchema>
 export type Location = z.infer<typeof locationSchema>
 export type Employee = z.infer<typeof employeeSchema>
 export type DeviceAssigned = z.infer<typeof deviceAssignedSchema>
+export type Vendor = z.infer<typeof vendorSchema>
+
 
 
