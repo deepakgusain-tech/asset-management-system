@@ -9,15 +9,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { deleteVendor, getVendors } from "@/lib/actions/vendor";
-import { Vendor } from "@/types";
+import { Requirement, Vendor } from "@/types";
 import { format } from "date-fns";
 import { EditIcon, Trash } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function VendorTable({ vendor }: { vendor: Vendor[] }) {
-  const [vendors, setVendors] = useState<Vendor[]>(vendor);
+export default function RequirementTable({ requirement }: { requirement: Requirement[] }) {
+  const [requirements, setRequirements] = useState<Requirement[]>(requirement);
 
   const deleteVendorHandler = async (id: any) => {
     let res = await deleteVendor(id);
@@ -31,8 +31,8 @@ export default function VendorTable({ vendor }: { vendor: Vendor[] }) {
         description: res?.message,
       });
 
-      const response = await getVendors();
-      setVendors(response as Vendor[]);
+      const response = await ();
+      setRequirements(response as Requirement[]);
     }
   };
 

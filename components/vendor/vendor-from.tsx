@@ -44,7 +44,7 @@ const VendorForm = ({
   data,
   update = false,
 }: {
-  data?: Vendor;
+  data?: any;
   update: boolean;
 }) => {
   const router = useRouter();
@@ -99,7 +99,7 @@ const VendorForm = ({
                 >;
               }) => (
                 <FormItem>
-                  <FormLabel>VEndor Code</FormLabel>
+                  <FormLabel>Vendor Code</FormLabel>
                   <FormControl>
                     <Input placeholder="Enter vendor code" {...field} />
                   </FormControl>

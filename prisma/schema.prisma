@@ -224,26 +224,47 @@ model DeviceAssigned {
 }
 
 model Vendor {
-  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  vendorCode     String   @unique 
-  name           String   
-  contactPerson  String?  
-  phone          String?  
-  email          String?  
-  addressLine1   String?  
-  addressLine2   String?  
-  city           String?  
-  state          String?  
-  postalCode     String?  
-  country        String? 
-  taxId          String?  
-  website        String?  
-  status         VendorStatus @default(ACTIVE)
-  notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendorCode    String       @unique
+  name          String
+  contactPerson String?
+  phone         String?
+  email         String?
+  addressLine1  String?
+  addressLine2  String?
+  city          String?
+  state         String?
+  postalCode    String?
+  country       String?
+  taxId         String?
+  website       String?
+  status        VendorStatus @default(ACTIVE)
+  notes         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  requirements  RequirementVendor[]
+}
 
-  // Relations (optional but common)
-  // assets         Asset[]
-  // purchaseOrders PurchaseOrder[]
+model Requirement {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  manufatured       String
+  model             String
+  configuration     Json?
+  warranty          String
+  warrantyType      String?
+  quotationValidity DateTime @db.Timestamp(6)
+  createdAt         DateTime @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime @updatedAt
+  status            Status @default(ACTIVE)
+  vendors           RequirementVendor[]
+}
+
+model RequirementVendor {
+  requirementId String @db.Uuid
+  vendorId      String @db.Uuid
+
+  requirement Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@id([requirementId, vendorId])
 }

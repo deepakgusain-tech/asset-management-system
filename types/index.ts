@@ -8,7 +8,9 @@ import {
     roleSchema,
     userSchema,
     deviceAssignedSchema,
-    vendorSchema
+    vendorSchema,
+    requriementsSchema,
+    requriementVendorSchema
 } from "@/lib/validators";
 
 import z from "zod";
@@ -23,6 +25,10 @@ export type Location = z.infer<typeof locationSchema>
 export type Employee = z.infer<typeof employeeSchema>
 export type DeviceAssigned = z.infer<typeof deviceAssignedSchema>
 export type Vendor = z.infer<typeof vendorSchema>
+export type Requirement = z.infer<typeof requriementsSchema>
+export type RequirementVendor = z.infer<typeof requriementVendorSchema>
+
+
 
 
 

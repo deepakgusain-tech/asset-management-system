@@ -7,6 +7,9 @@ CREATE TYPE "AssignedDeviceStatus" AS ENUM ('ASSIGNED', 'NOTASSIGNED', 'RETURNED
 -- CreateEnum
 CREATE TYPE "DeviceStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'MAINTENANCE', 'RETIRED');
 
+-- CreateEnum
+CREATE TYPE "VendorStatus" AS ENUM ('ACTIVE', 'INACTIVE', 'BLACKLISTED');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
@@ -15,8 +18,8 @@ CREATE TABLE "User" (
     "emailVerified" TIMESTAMP(3),
     "image" TEXT,
     "password" TEXT NOT NULL,
-    "role" INTEGER,
-    "status" BOOLEAN NOT NULL DEFAULT false,
+    "roleId" UUID NOT NULL,
+    "status" "Status" NOT NULL DEFAULT 'ACTIVE',
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(6) NOT NULL,
 
@@ -58,7 +61,7 @@ CREATE TABLE "Role" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
-    "status" BOOLEAN NOT NULL DEFAULT false,
+    "status" "Status" NOT NULL DEFAULT 'ACTIVE',
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(6) NOT NULL,
 
@@ -71,7 +74,7 @@ CREATE TABLE "Module" (
     "name" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "roleId" UUID NOT NULL,
-    "status" BOOLEAN NOT NULL DEFAULT false,
+    "status" "Status" NOT NULL DEFAULT 'ACTIVE',
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(6) NOT NULL,
 
@@ -172,6 +175,53 @@ CREATE TABLE "DeviceAssigned" (
     CONSTRAINT "DeviceAssigned_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Vendor" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "vendorCode" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "contactPerson" TEXT,
+    "phone" TEXT,
+    "email" TEXT,
+    "addressLine1" TEXT,
+    "addressLine2" TEXT,
+    "city" TEXT,
+    "state" TEXT,
+    "postalCode" TEXT,
+    "country" TEXT,
+    "taxId" TEXT,
+    "website" TEXT,
+    "status" "VendorStatus" NOT NULL DEFAULT 'ACTIVE',
+    "notes" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Vendor_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Requirement" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "manufatured" TEXT NOT NULL,
+    "model" TEXT NOT NULL,
+    "configuration" JSONB,
+    "warranty" TEXT NOT NULL,
+    "warrantyType" TEXT,
+    "quotationValidity" TIMESTAMP(6) NOT NULL,
+    "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Requirement_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RequirementVendor" (
+    "requirementId" UUID NOT NULL,
+    "vendorId" UUID NOT NULL,
+
+    CONSTRAINT "RequirementVendor_pkey" PRIMARY KEY ("requirementId","vendorId")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_idx" ON "User"("email");
 
@@ -220,6 +270,12 @@ CREATE INDEX "DeviceAssigned_deviceId_idx" ON "DeviceAssigned"("deviceId");
 -- CreateIndex
 CREATE INDEX "DeviceAssigned_employeeId_idx" ON "DeviceAssigned"("employeeId");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Vendor_vendorCode_key" ON "Vendor"("vendorCode");
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "Role"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -243,3 +299,9 @@ ALTER TABLE "DeviceAssigned" ADD CONSTRAINT "DeviceAssigned_deviceId_fkey" FOREI
 
 -- AddForeignKey
 ALTER TABLE "DeviceAssigned" ADD CONSTRAINT "DeviceAssigned_employeeId_fkey" FOREIGN KEY ("employeeId") REFERENCES "Employee"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RequirementVendor" ADD CONSTRAINT "RequirementVendor_requirementId_fkey" FOREIGN KEY ("requirementId") REFERENCES "Requirement"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RequirementVendor" ADD CONSTRAINT "RequirementVendor_vendorId_fkey" FOREIGN KEY ("vendorId") REFERENCES "Vendor"("id") ON DELETE CASCADE ON UPDATE CASCADE;

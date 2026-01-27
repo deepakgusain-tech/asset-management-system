@@ -1,5 +1,5 @@
 import z from "zod";
-import { AssignedDeviceStatus, Status } from "./generated/prisma/enums";
+import { AssignedDeviceStatus, Status, VendorStatus } from "./generated/prisma/enums";
 
 export const statusEnum = z.enum(["ACTIVE", "INACTIVE"]);
 
@@ -136,6 +136,27 @@ export const vendorSchema = z.object({
   country: z.string().min(1, "country is required"),
   taxId: z.string().min(1, "taxID is required"),
   website: z.string().min(1, "website is required"),
-  status: z.enum(Object.values(Status)),
+  status: z.enum(Object.values(VendorStatus)),
   notes: z.string().min(1, "note is required"),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// requriements
+export const requriementsSchema = z.object({
+  id: z.string().optional(),
+  manufatured: z.string().min(1, "manufatured is required"),
+  model: z.string().min(1, "model is required"),
+  configuration: z.string().min(1, "configuration is required"),
+  warranty: z.string().min(1, "warranty is required"),
+  warrantyType: z.string().min(1, "warrantyType is required"),
+  quotationValidity: z.union([z.date(), z.string()]),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// requriement vendor
+export const requriementVendorSchema = z.object({
+  requirementId: z.string().min(1, "manufatured is required"),
+  vendorId: z.string().min(1, "model is required"),
 });
