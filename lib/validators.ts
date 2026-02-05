@@ -1,0 +1,182 @@
+import z from "zod";
+import { AssignedDeviceStatus, Status, VendorStatus,RequirementStatus } from "./generated/prisma/enums";
+
+export const statusEnum = z.enum(["ACTIVE", "INACTIVE"]);
+
+// user schema
+export const userSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "User name is required"),
+  email: z.email().min(1, "User email is required"),
+  // image: z.string().min(6, "User image is required").optional(),
+  image: z.union([z.instanceof(File), z.string().nullable()]).optional(),
+  password: z.string().min(1, "User password is required"),
+  status: z.enum(Object.values(Status)),
+  roleId: z.string(),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// role schema
+export const roleSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Role name is required"),
+  description: z.string().min(1, "Role description is required"),
+  status: z.enum(Object.values(Status)),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// module schema
+export const moduleSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Role name is required"),
+  description: z.string().min(1, "Role description is required"),
+  roleId: z.string(),
+  status: z.enum(Object.values(Status)),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// deviceCategory schema
+export const deviceCateorySchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Device Category name is required"),
+  description: z.string().min(1, "Device Category description is required"),
+  status: z.enum(Object.values(Status)),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// device schema
+export const deviceSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Device name is required"),
+  serialNumber: z.string().min(1, "Device serial number is required"),
+  description: z.string().min(1, "Device description is required"),
+  status: z.enum(Object.values(Status)),
+  categoryId: z.string().min(1, "Device categoryid is required"),
+  manufacturer: z.string().min(1, "Device manufacturer is required"),
+  model: z.string().min(1, "Device model is required"),
+  purchaseDate: z.date().nullable(),
+  warrantyEnd: z.date().nullable(),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// department schema
+export const departmentSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Department name is required"),
+  description: z.string().min(1, "Department description is required"),
+  status: z.enum(Object.values(Status)),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// employee schema
+export const employeeSchema = z.object({
+  id: z.string().optional(),
+  first_name: z.string().min(1, "Employee first_name is required"),
+  last_name: z.string().min(1, "Employee last_name is required"),
+  email: z.string().min(1, "Employee email is required"),
+  phoneNumber: z.string().min(1, "Employee phone number is required"),
+  dateOfBirth: z.date().nullable().optional(),
+  hireDate: z.date().nullable().optional(),
+  salary: z.string().min(1, "Employee salary is required"),
+  status: z.enum(Object.values(Status)),
+  departmentId: z.string().min(1, "Department is required"),
+  locationId: z.string().min(1, "Location is required"),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// location schema
+export const locationSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(1, "Location name is required"),
+  streetAddress: z.string().min(1, "Street Address is required"),
+  city: z.string().min(1, "City is required"),
+  state: z.string().min(1, "State is required"),
+  postalCode: z.string().min(1, "Postal Code is required"),
+  country: z.string().min(1, "Country is required"),
+  latitude: z.string().optional(),
+  longitude: z.string().optional(),
+  status: z.enum(Object.values(Status)),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// device assigned schema
+export const deviceAssignedSchema = z.object({
+  id: z.string().optional(),
+  deviceId: z.string(),
+  employeeId: z.string(),
+  remarks: z.string(),
+  status: z.enum(Object.values(AssignedDeviceStatus)),
+  assignedDate: z.union([z.date(), z.string()]),
+  returnedDate: z.union([z.date(), z.string()]).nullable().optional(),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// vendor table schema
+export const vendorSchema = z.object({
+  id: z.string().optional(),
+  vendorCode: z.string().min(1, "vendor code is required"),
+  name: z.string().min(1, "vendor name is required"),
+  contactPerson: z.string().min(1, "contact person is required"),
+  phone: z.string().min(1, "phone is required"),
+  email: z.string().min(1, "email is required"),
+  addressLine1: z.string().min(1, "address line 1 is required"),
+  addressLine2: z.string().min(1, "address line 2 is required"),
+  city: z.string().min(1, "city is required"),
+  state: z.string().min(1, "state is required"),
+  postalCode: z.string().min(1, "postal code is required"),
+  country: z.string().min(1, "country is required"),
+  taxId: z.string().min(1, "taxID is required"),
+  website: z.string().min(1, "website is required"),
+  status: z.enum(Object.values(VendorStatus)),
+  notes: z.string().min(1, "note is required"),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// requriements
+export const requriementsSchema = z.object({
+  id: z.string().optional(),
+  configuration: z.array(
+  z.object({
+    item: z.string().min(1),
+    quantity: z.string().min(1),
+    description: z.string().optional(),
+  })
+).optional(),
+
+vendorIds: z.array(z.string()).optional(),
+
+  manufatured: z.string().min(1, "manufatured is required"),
+  model: z.string().min(1, "model is required"),
+  warranty: z.enum(["TENURE", "TILL_DATE"]),
+  delivery: z.union([z.date(), z.string()]),
+  warrantyType: z.enum([
+  "MANUFACTURER",
+  "EXTENDED",
+  "AMC",
+  "ACCIDENTAL_DAMAGE",
+  "REPLACEMENT",
+  "VENDOR_WARRANTY",
+  "NO_WARRANTY",
+]),
+  quotationValidity: z.union([z.date(), z.string()]),
+  status: z.enum(Object.values(RequirementStatus)),
+  notes: z.string().min(1, "note is required"),
+  createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
+});
+
+// requriement vendor
+export const requriementVendorSchema = z.object({
+  requirementId: z.string().min(1, "manufatured is required"),
+  vendorId: z.string().min(1, "model is required"),
+});
