@@ -169,3 +169,31 @@ export const configurationSchema = z.object({
   email: z.string().optional(),
   password: z.string().optional(),
 })
+
+export const purchaseOrderItemSchema = z.object({
+  deviceCategoryId: z.string().uuid(),
+  quantity: z.number().int().positive(),
+  unitPrice: z.number().nonnegative()
+});
+
+export const createPurchaseOrderSchema = z.object({
+  requirementId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  items: z
+    .array(purchaseOrderItemSchema)
+    .min(1, "At least one item is required")
+});
+
+export const vendorRequestSchema = z.object({
+  manufatured: z.string().min(2, "Manufacturer is required"),
+  model: z.string().min(1, "Model is required"),
+  configuration: z.string().optional(),
+  warranty: z.string().min(1, "Warranty is required"),
+  warrantyType: z.string().optional(),
+  quotationValidity: z.coerce.date(),
+  price: z.coerce.number().positive("Price must be greater than 0"),
+  remarks: z.string().optional(),
+});
+
+export type VendorRequestInput = z.infer<typeof vendorRequestSchema>;
+
