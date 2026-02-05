@@ -160,3 +160,12 @@ export const requriementVendorSchema = z.object({
   requirementId: z.string().min(1, "manufatured is required"),
   vendorId: z.string().min(1, "model is required"),
 });
+
+// configuration
+export const configurationSchema = z.object({
+  name: z.string().optional(),
+  logo: z.object().optional(),
+  favicon: z.object().optional(),
+  email: z.string().optional(),
+  password: z.string().optional(),
+})

@@ -224,8 +224,8 @@ model DeviceAssigned {
 }
 
 model Vendor {
-  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  vendorCode    String       @unique
+  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendorCode    String              @unique
   name          String
   contactPerson String?
   phone         String?
@@ -238,24 +238,24 @@ model Vendor {
   country       String?
   taxId         String?
   website       String?
-  status        VendorStatus @default(ACTIVE)
+  status        VendorStatus        @default(ACTIVE)
   notes         String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
   requirements  RequirementVendor[]
 }
 
 model Requirement {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   manufatured       String
   model             String
   configuration     Json?
   warranty          String
   warrantyType      String?
-  quotationValidity DateTime @db.Timestamp(6)
-  createdAt         DateTime @default(now()) @db.Timestamp(6)
-  updatedAt         DateTime @updatedAt
-  status            Status @default(ACTIVE)
+  quotationValidity DateTime            @db.Timestamp(6)
+  createdAt         DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime            @updatedAt
+  status            Status              @default(ACTIVE)
   vendors           RequirementVendor[]
 }
 
@@ -267,4 +267,13 @@ model RequirementVendor {
   vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
   @@id([requirementId, vendorId])
+}
+
+model Configuration {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String?
+  logo     String?
+  favicon  String?
+  email    String?
+  password String?
 }
