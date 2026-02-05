@@ -1,5 +1,9 @@
 import z from "zod";
+<<<<<<< HEAD
 import { AssignedDeviceStatus, Status, VendorStatus,RequirementStatus } from "./generated/prisma/enums";
+=======
+import { AssignedDeviceStatus, Status, VendorStatus } from "./generated/prisma/enums";
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
 
 export const statusEnum = z.enum(["ACTIVE", "INACTIVE"]);
 
@@ -145,6 +149,7 @@ export const vendorSchema = z.object({
 // requriements
 export const requriementsSchema = z.object({
   id: z.string().optional(),
+<<<<<<< HEAD
   configuration: z.array(
   z.object({
     item: z.string().min(1),
@@ -171,6 +176,14 @@ vendorIds: z.array(z.string()).optional(),
   quotationValidity: z.union([z.date(), z.string()]),
   status: z.enum(Object.values(RequirementStatus)),
   notes: z.string().min(1, "note is required"),
+=======
+  manufatured: z.string().min(1, "manufatured is required"),
+  model: z.string().min(1, "model is required"),
+  configuration: z.string().min(1, "configuration is required"),
+  warranty: z.string().min(1, "warranty is required"),
+  warrantyType: z.string().min(1, "warrantyType is required"),
+  quotationValidity: z.union([z.date(), z.string()]),
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
   createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
 });
@@ -180,3 +193,43 @@ export const requriementVendorSchema = z.object({
   requirementId: z.string().min(1, "manufatured is required"),
   vendorId: z.string().min(1, "model is required"),
 });
+<<<<<<< HEAD
+=======
+
+// configuration
+export const configurationSchema = z.object({
+  name: z.string().optional(),
+  logo: z.object().optional(),
+  favicon: z.object().optional(),
+  email: z.string().optional(),
+  password: z.string().optional(),
+})
+
+export const purchaseOrderItemSchema = z.object({
+  deviceCategoryId: z.string().uuid(),
+  quantity: z.number().int().positive(),
+  unitPrice: z.number().nonnegative()
+});
+
+export const createPurchaseOrderSchema = z.object({
+  requirementId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  items: z
+    .array(purchaseOrderItemSchema)
+    .min(1, "At least one item is required")
+});
+
+export const vendorRequestSchema = z.object({
+  manufatured: z.string().min(2, "Manufacturer is required"),
+  model: z.string().min(1, "Model is required"),
+  configuration: z.string().optional(),
+  warranty: z.string().min(1, "Warranty is required"),
+  warrantyType: z.string().optional(),
+  quotationValidity: z.coerce.date(),
+  price: z.coerce.number().positive("Price must be greater than 0"),
+  remarks: z.string().optional(),
+});
+
+export type VendorRequestInput = z.infer<typeof vendorRequestSchema>;
+
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a

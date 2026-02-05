@@ -1,6 +1,10 @@
 "use server";
 
+<<<<<<< HEAD
 import { Requirement } from "@/types";
+=======
+import { Requirement, Vendor } from "@/types";
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
 import { prisma } from "../db/prisma-helper";
 import { formatError } from "../utils";
 import { requriementsSchema } from "../validators";
@@ -15,6 +19,7 @@ export async function getRequirement() {
 }
 
 // create requirement
+<<<<<<< HEAD
 export async function createRequirement(data: any) {
   try {
     const parsed = requriementsSchema.parse(data);
@@ -52,6 +57,21 @@ export async function createRequirement(data: any) {
     };
   } catch (error) {
     console.error("CREATE REQUIREMENT ERROR:", error);throw error; 
+=======
+export async function createRequirement(data: Requirement) {
+  try {
+    const requirement = requriementsSchema.parse(data);
+
+    await prisma.requirement.create({
+      data: requirement,
+    });
+
+    return {
+      success: true,
+      message: "Requirment created successfully",
+    };
+  } catch (error) {
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
     return {
       success: false,
       message: formatError(error),
@@ -87,6 +107,7 @@ export async function getRequirementById(id: string) {
 }
 
 // update requirement
+<<<<<<< HEAD
 export async function updateRequirement(data: any, id: string) {
   try {
     const parsed = requriementsSchema.parse(data);
@@ -123,12 +144,26 @@ export async function updateRequirement(data: any, id: string) {
       });
     }
 
+=======
+export async function updateRequirement(data: Requirement, id: string) {
+  try {
+    const requirement = requriementsSchema.parse(data);
+
+    await prisma.requirement.update({
+      where: { id },
+      data: requirement,
+    });
+
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
     return {
       success: true,
       message: "Requirement updated successfully",
     };
   } catch (error) {
+<<<<<<< HEAD
     console.error("UPDATE REQUIREMENT ERROR:", error);throw error; 
+=======
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
     return {
       success: false,
       message: formatError(error),

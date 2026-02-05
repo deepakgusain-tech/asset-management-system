@@ -109,6 +109,7 @@ export const vendorDefaultValues = {
   status: VendorStatus.ACTIVE,
   notes: "",
 };
+<<<<<<< HEAD
 
 export const requirementDefaultValues ={
   vendorIds: [],
@@ -123,3 +124,5 @@ export const requirementDefaultValues ={
   notes: "",
 };
 
+=======
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a

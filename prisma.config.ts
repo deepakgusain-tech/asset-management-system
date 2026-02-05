@@ -13,14 +13,3 @@ export default defineConfig({
   },
 });
 
-// NEXT_APP_APP_NAME = "Asset management system"
-// NEXT_APP_DESCRIPTION = "Asset management system"
-
-// NEXT_APP_SERVER_URL = "http://localhost:3000"
-
-
-// NEXTAUTH_SECRET = "2tF+z/QCyx/uYltmi+dtBUhCuQvNpsnbtollxQsmbz8="
-// NEXTAUTH_URL= "http://localhost:3000/"
-// NEXTAUTH_URL_INTERNAL = "http://localhost:3000/"
-
-// DATABASE_URL="postgresql://neondb_owner:npg_1StYyUhe7Ixb@ep-wandering-surf-a1k798mm-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"

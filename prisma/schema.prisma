@@ -108,6 +108,10 @@ model Module {
 model DeviceCategory {
   id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String @unique(map: "device_category_name_idx")
+<<<<<<< HEAD
+=======
+  purchaseOrderItems PurchaseOrderItem[]
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
   description String
   status      Status @default(ACTIVE)
 
@@ -224,8 +228,14 @@ model DeviceAssigned {
 }
 
 model Vendor {
+<<<<<<< HEAD
   id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   vendorCode    String       @unique
+=======
+  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendorCode    String              @unique
+  purchaseOrders PurchaseOrder[]
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
   name          String
   contactPerson String?
   phone         String?
@@ -238,14 +248,22 @@ model Vendor {
   country       String?
   taxId         String?
   website       String?
+<<<<<<< HEAD
   status        VendorStatus @default(ACTIVE)
   notes         String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+=======
+  status        VendorStatus        @default(ACTIVE)
+  notes         String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
   requirements  RequirementVendor[]
 }
 
 model Requirement {
+<<<<<<< HEAD
   id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   manufatured       String
   model             String
@@ -257,15 +275,100 @@ model Requirement {
   createdAt         DateTime @default(now()) @db.Timestamp(6)
   updatedAt         DateTime @updatedAt
   status            Status @default(ACTIVE)
+=======
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  manufatured       String
+  purchaseOrders PurchaseOrder[]
+  model             String
+  configuration     Json?
+  warranty          String
+  warrantyType      String?
+  quotationValidity DateTime            @db.Timestamp(6)
+  createdAt         DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime            @updatedAt
+  status            Status              @default(ACTIVE)
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
   vendors           RequirementVendor[]
 }
 
 model RequirementVendor {
   requirementId String @db.Uuid
   vendorId      String @db.Uuid
+<<<<<<< HEAD
+=======
+  price Float
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
 
   requirement Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
   vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
 
   @@id([requirementId, vendorId])
 }
+<<<<<<< HEAD
+=======
+
+model Configuration {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String?
+  logo     String?
+  favicon  String?
+  email    String?
+  password String?
+}
+
+/* ============================
+   PURCHASE ORDER ENUM
+============================ */
+
+enum PurchaseOrderStatus {
+  DRAFT
+  SENT
+  APPROVED
+  RECEIVED
+  CANCELLED
+}
+
+/* ============================
+   PURCHASE ORDER
+============================ */
+
+model PurchaseOrder {
+  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  poNumber      String              @unique
+  requirementId String              @db.Uuid
+  vendorId      String              @db.Uuid
+  status        PurchaseOrderStatus @default(DRAFT)
+  totalAmount   Float
+
+  requirement Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  items       PurchaseOrderItem[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  @@index([requirementId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+/* ============================
+   PURCHASE ORDER ITEMS
+============================ */
+
+model PurchaseOrderItem {
+  id               String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  purchaseOrderId  String  @db.Uuid
+  deviceCategoryId String  @db.Uuid
+  quantity         Int
+  unitPrice        Float
+  totalPrice       Float
+
+  purchaseOrder  PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  deviceCategory DeviceCategory @relation(fields: [deviceCategoryId], references: [id], onDelete: Cascade)
+
+  @@index([purchaseOrderId])
+  @@index([deviceCategoryId])
+}
+
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a

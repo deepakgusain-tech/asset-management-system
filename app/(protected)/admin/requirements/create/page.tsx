@@ -9,7 +9,6 @@ import { Vendor } from "@/types";
 const RequirementCreatePage = async () => {
 
   const vendors = await getVendors();
-
   return (
     <Card>
       <CardHeader>
@@ -27,5 +26,4 @@ const RequirementCreatePage = async () => {
     </Card>
   );
 };
-
 export default RequirementCreatePage;

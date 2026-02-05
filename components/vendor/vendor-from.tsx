@@ -30,6 +30,19 @@ import { VendorStatus } from "@/lib/generated/prisma/enums";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
 
+<<<<<<< HEAD
+=======
+export interface Vendor {
+  id?: string;
+  name: string;
+  email?: string;
+  phoneNumber?: string;
+  vendorTypeId?: string;
+  address?: string;
+  status: "ACTIVE" | "INACTIVE";
+}
+
+>>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
 const VendorForm = ({
   data,
   update = false,
