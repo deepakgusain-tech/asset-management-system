@@ -31,13 +31,13 @@ export default function VendorTable({ vendor }: { vendor: Vendor[] }) {
         description: res?.message,
       });
 
-      const response = await getVendors();
+      const response = await getVendors();                                  
       setVendors(response as Vendor[]);
     }
   };
 
   return (
-    <div className="rounded-lg border bg-white">
+    <div className="w-full                                            ">
       <Table>
         <TableHeader>
           <TableRow>

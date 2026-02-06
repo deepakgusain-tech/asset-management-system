@@ -12,8 +12,8 @@ const requirementsPage = async () => {
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <h1 className="text-lg font-semibold">requirement</h1>
-          <Button variant="default" className="bg-blue-500 hover:bg-blue-600">
+          <h1 className="text-lg font-semibold">Requirement</h1>
+          <Button variant="default" className="bg-blue-500 hover:bg-blue-600 text-white">
             <Link href="/admin/requirements/create">Add Requirements</Link>
           </Button>
         </div>

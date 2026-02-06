@@ -1,69 +1,45 @@
 "use server";
 
-<<<<<<< HEAD
 import { Requirement } from "@/types";
-=======
-import { Requirement, Vendor } from "@/types";
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
 import { prisma } from "../db/prisma-helper";
 import { formatError } from "../utils";
 import { requriementsSchema } from "../validators";
+import { sendMail } from "../mail";
+import { requirementEmailTemplate } from "../requirement-template";
 
 // get requirement
 export async function getRequirement() {
   return await prisma.requirement.findMany({
     orderBy: {
-      createdAt: "desc",
+      createdAt: 'desc'
     },
-  });
+  })
 }
 
 // create requirement
-<<<<<<< HEAD
-export async function createRequirement(data: any) {
+export async function createRequirement(data: Requirement) {
   try {
-    const parsed = requriementsSchema.parse(data);
-    const { vendorIds, ...rest } = parsed;
 
-    const requirement = await prisma.requirement.create({
+    await prisma.requirement.create({
       data: {
-        manufatured: rest.manufatured,
-        model: rest.model,
-        warranty: rest.warranty,
-        warrantyType: rest.warrantyType ?? null,
-
-        configuration: (rest.configuration ?? null) as any,
-
-        quotationValidity: rest.quotationValidity
-          ? new Date(rest.quotationValidity as any)
-          : new Date(),
-
-        delivery: rest.delivery ? new Date(rest.delivery as any) : null,
+        manufatured: data.manufatured,
+        model: data.model,
+        vendorIds: data.vendorIds,
+        configuration: JSON.stringify(data.configuration),
+        warranty: data.warranty,
+        warrantyType: data.warrantyType,
+        quotationValidity: data.quotationValidity,
+        status: data.status,
+        notes: data.notes,
       },
     });
 
-    if (vendorIds?.length) {
-      await prisma.requirementVendor.createMany({
-        data: vendorIds.map((vId: string) => ({
-          requirementId: requirement.id,
-          vendorId: vId,
-        })),
-      });
-    }
+    let html = requirementEmailTemplate(data)
 
-    return {
-      success: true,
-      message: "Requirement created successfully",
-    };
-  } catch (error) {
-    console.error("CREATE REQUIREMENT ERROR:", error);throw error; 
-=======
-export async function createRequirement(data: Requirement) {
-  try {
-    const requirement = requriementsSchema.parse(data);
-
-    await prisma.requirement.create({
-      data: requirement,
+    await sendMail({
+      to: "deepak@mail.com",
+      subject : "subject",
+      html,
     });
 
     return {
@@ -71,7 +47,6 @@ export async function createRequirement(data: Requirement) {
       message: "Requirment created successfully",
     };
   } catch (error) {
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
     return {
       success: false,
       message: formatError(error),
@@ -107,44 +82,6 @@ export async function getRequirementById(id: string) {
 }
 
 // update requirement
-<<<<<<< HEAD
-export async function updateRequirement(data: any, id: string) {
-  try {
-    const parsed = requriementsSchema.parse(data);
-    const { vendorIds, ...rest } = parsed;
-
-    await prisma.requirement.update({
-      where: { id },
-      data: {
-        manufatured: rest.manufatured,
-        model: rest.model,
-        warranty: rest.warranty,
-        warrantyType: rest.warrantyType ?? null,
-
-        configuration: (rest.configuration ?? null) as any,
-
-        quotationValidity: rest.quotationValidity
-          ? new Date(rest.quotationValidity as any)
-          : new Date(),
-
-        delivery: rest.delivery ? new Date(rest.delivery as any) : null,
-      },
-    });
-
-    await prisma.requirementVendor.deleteMany({
-      where: { requirementId: id },
-    });
-
-    if (vendorIds?.length) {
-      await prisma.requirementVendor.createMany({
-        data: vendorIds.map((vId: string) => ({
-          requirementId: id,
-          vendorId: vId,
-        })),
-      });
-    }
-
-=======
 export async function updateRequirement(data: Requirement, id: string) {
   try {
     const requirement = requriementsSchema.parse(data);
@@ -154,16 +91,11 @@ export async function updateRequirement(data: Requirement, id: string) {
       data: requirement,
     });
 
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
     return {
       success: true,
       message: "Requirement updated successfully",
     };
   } catch (error) {
-<<<<<<< HEAD
-    console.error("UPDATE REQUIREMENT ERROR:", error);throw error; 
-=======
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
     return {
       success: false,
       message: formatError(error),

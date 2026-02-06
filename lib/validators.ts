@@ -1,9 +1,5 @@
 import z from "zod";
-<<<<<<< HEAD
-import { AssignedDeviceStatus, Status, VendorStatus,RequirementStatus } from "./generated/prisma/enums";
-=======
 import { AssignedDeviceStatus, Status, VendorStatus } from "./generated/prisma/enums";
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
 
 export const statusEnum = z.enum(["ACTIVE", "INACTIVE"]);
 
@@ -149,58 +145,61 @@ export const vendorSchema = z.object({
 // requriements
 export const requriementsSchema = z.object({
   id: z.string().optional(),
-<<<<<<< HEAD
+  manufatured: z.string().min(1),
+  model: z.string().min(1),
+
+  vendorIds: z.array(z.string()),
+
   configuration: z.array(
-  z.object({
-    item: z.string().min(1),
-    quantity: z.string().min(1),
-    description: z.string().optional(),
-  })
-).optional(),
+    z.object({
+      item: z.string().min(1, "Item required"),
+      quantity: z.string().optional(),
+      description: z.string().optional(),
+    })
+  ),
 
-vendorIds: z.array(z.string()).optional(),
+  warranty: z.string(),
+  warrantyType: z.string().optional(),
 
-  manufatured: z.string().min(1, "manufatured is required"),
-  model: z.string().min(1, "model is required"),
-  warranty: z.enum(["TENURE", "TILL_DATE"]),
-  delivery: z.union([z.date(), z.string()]),
-  warrantyType: z.enum([
-  "MANUFACTURER",
-  "EXTENDED",
-  "AMC",
-  "ACCIDENTAL_DAMAGE",
-  "REPLACEMENT",
-  "VENDOR_WARRANTY",
-  "NO_WARRANTY",
-]),
-  quotationValidity: z.union([z.date(), z.string()]),
-  status: z.enum(Object.values(RequirementStatus)),
-  notes: z.string().min(1, "note is required"),
-=======
-  manufatured: z.string().min(1, "manufatured is required"),
-  model: z.string().min(1, "model is required"),
-  configuration: z.string().min(1, "configuration is required"),
-  warranty: z.string().min(1, "warranty is required"),
-  warrantyType: z.string().min(1, "warrantyType is required"),
-  quotationValidity: z.union([z.date(), z.string()]),
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
+  quotationValidity: z.union([z.string(), z.date()]),
+
+  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+
+  notes: z.string().optional(),
   createdAt: z.date().nullable().optional(),
   updatedAt: z.date().nullable().optional(),
 });
 
-// requriement vendor
-export const requriementVendorSchema = z.object({
-  requirementId: z.string().min(1, "manufatured is required"),
-  vendorId: z.string().min(1, "model is required"),
+// procurement schema
+export const procurementSchema = z.object({
+  id: z.string().optional(),
+  manufatured: z.string().min(1),
+  model: z.string().min(1),
+  vendorId: z.string(),
+  requirementId: z.string(),
+  configuration: z.array(
+    z.object({
+      item: z.string().min(1, "Item required"),
+      quantity: z.string().optional(),
+      description: z.string().optional(),
+    })
+  ),
+
+  warranty: z.string(),
+  warrantyType: z.string().optional(),
+  quotationValidity: z.union([z.string(), z.date()]),
+  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+  notes: z.string().optional(),
+   createdAt: z.date().nullable().optional(),
+  updatedAt: z.date().nullable().optional(),
 });
-<<<<<<< HEAD
-=======
 
 // configuration
 export const configurationSchema = z.object({
+  id: z.string().optional(),
   name: z.string().optional(),
-  logo: z.object().optional(),
-  favicon: z.object().optional(),
+  logo: z.union([z.instanceof(File), z.string()]).optional(),
+  favicon: z.union([z.instanceof(File), z.string()]).optional(),
   email: z.string().optional(),
   password: z.string().optional(),
 })
@@ -232,4 +231,3 @@ export const vendorRequestSchema = z.object({
 
 export type VendorRequestInput = z.infer<typeof vendorRequestSchema>;
 
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a

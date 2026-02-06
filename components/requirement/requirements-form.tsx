@@ -21,13 +21,12 @@ import {
 } from "../ui/select";
 import { Button } from "../ui/button";
 import { getVendors } from "@/lib/actions/vendor";
-import { ArrowRight, Loader } from "lucide-react";
+import { ArrowRight, CalendarIcon, Loader } from "lucide-react";
 import { requriementsSchema } from "@/lib/validators";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { requirementDefaultValues } from "@/lib/constants";
 import { toast } from "sonner";
-import { RequirementStatus } from "@/lib/generated/prisma/enums";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
 import {
@@ -35,6 +34,11 @@ import {
   updateRequirement,
 } from "@/lib/actions/requirements";
 import { Vendor } from "@/types";
+import { Status } from "@/lib/generated/prisma/enums";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "../ui/calendar";
+import { cn } from "@/lib/utils";
 
 const RequirementForm = ({
   data,
@@ -48,12 +52,8 @@ const RequirementForm = ({
   const router = useRouter();
   const id = data?.id;
 
-  if (data?.configuration && typeof data.configuration === "string") {
-    try {
-      data.configuration = JSON.parse(data.configuration);
-    } catch {
-      data.configuration = [{ value: "", description: "" }];
-    }
+  if(id && typeof data.configuration === "string") {
+    data.configuration = JSON.parse(data.configuration)
   }
 
   const form = useForm<z.infer<typeof requriementsSchema>>({
@@ -77,6 +77,7 @@ const RequirementForm = ({
       const payload = {
         ...values,
       };
+
 
       if (update && id) {
         res = await updateRequirement(payload, id);
@@ -144,7 +145,7 @@ const RequirementForm = ({
                       return (
                         <span
                           key={id}
-                          className="px-2 py-1 bg-gray-200 rounded text-sm"
+                          className="px-2 py-1 rounded text-sm"
                         >
                           {v?.vendorCode}
                         </span>
@@ -265,47 +266,37 @@ const RequirementForm = ({
             />
           </div>
 
-          <div className="flex flex-col gap-5">
+          <div className='flex flex-col gap-5'>
             <FormField
               control={form.control}
-              name="delivery"
-              render={({ field }) => (
+              name='quotationValidity'
+              render={({
+                field
+              }) => (
                 <FormItem>
-                  <FormLabel>Delivery (TAT)</FormLabel>
+                  <FormLabel>Returned Date</FormLabel>
                   <FormControl>
-                    <Input
-                      type="date"
-                      value={
-                        field.value
-                          ? new Date(field.value).toISOString().split("T")[0]
-                          : ""
-                      }
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex flex-col gap-5">
-            <FormField
-              control={form.control}
-              name="quotationValidity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quotation Valid Till</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="date"
-                      value={
-                        field.value
-                          ? new Date(field.value).toISOString().split("T")[0]
-                          : ""
-                      }
-                      onChange={(e) => field.onChange(e.target.value)}
-                    />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "justify-start text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={field.value as Date}
+                          onSelect={field.onChange}
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -332,21 +323,18 @@ const RequirementForm = ({
                     <Select
                       defaultValue={field.value}
                       onValueChange={(v) =>
-                        field.onChange(v as RequirementStatus)
+                        field.onChange(v as Status)
                       }
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Status" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={RequirementStatus.ACTIVE}>
+                        <SelectItem value={Status.ACTIVE}>
                           Active
                         </SelectItem>
-                        <SelectItem value={RequirementStatus.INACTIVE}>
+                        <SelectItem value={Status.INACTIVE}>
                           Inactive
-                        </SelectItem>
-                        <SelectItem value={RequirementStatus.BLACKLISTED}>
-                          Blacklisted
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -456,7 +444,7 @@ const RequirementForm = ({
                   <Textarea
                     rows={20}
                     className="h-40"
-                    placeholder="Enter description"
+                    placeholder="Enter Notes"
                     {...field}
                   />
                 </FormControl>
@@ -481,3 +469,5 @@ const RequirementForm = ({
 };
 
 export default RequirementForm;
+
+

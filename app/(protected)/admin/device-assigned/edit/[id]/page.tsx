@@ -26,10 +26,10 @@ const DepartmentEditPage = async ({ params }: { params: Promise<{ id: string }> 
                 </div>
             </CardHeader>
             <CardContent>
-                <DeviceAssignedForm data={res.data} update={true} devices={devices as Device[]} employees={empoloyees as Employee[]}/>
+                <DeviceAssignedForm data={res.data} update={true} devices={devices as Device[]} employees={empoloyees as Employee[]} />
             </CardContent>
         </Card>
     )
 }
 
-export default DepartmentEditPage
+export default DepartmentEditPage                                                                                                                                                                   

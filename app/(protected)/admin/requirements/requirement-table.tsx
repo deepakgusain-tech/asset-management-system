@@ -17,7 +17,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export default function RequirementTable({ requirement }: { requirement: Requirement[] }) {
-  const [Requirement, setRequirements] = useState<Requirement[]>(requirement);
+  const [Requirement, setRequirements] = useState<Requirement[]>(requirement); 
 
   const deleteRequirementHandler = async (id: any) => {
     let res = await deleteRequirement(id);
@@ -37,7 +37,7 @@ export default function RequirementTable({ requirement }: { requirement: Require
   };
 
   return (
-    <div className="rounded-lg border bg-white">
+    <div className="w-full">
       <Table>
         <TableHeader>
           <TableRow>
@@ -64,7 +64,7 @@ export default function RequirementTable({ requirement }: { requirement: Require
                     size="icon"
                     className="bg-orange-500 hover:bg-orange-600"
                   >
-                    <Link href={`/admin/vendor/edit/${Requirement.id}`}>
+                    <Link href={`/admin/requirements/edit/${Requirement.id}`}>
                       <EditIcon size={16} />
                     </Link>
                   </Button>

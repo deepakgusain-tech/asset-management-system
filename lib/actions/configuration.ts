@@ -6,18 +6,25 @@ import { configurationSchema } from "../validators";
 import { formatError } from "../utils";
 
 // get configuration
-export async function getVendors() {
-  return await prisma.configuration.findOne({});
+export async function getConfiguration() {
+  return await prisma.configuration.findFirst({});
 }
 
 // create configuration
-export async function createConfiguration(data: Configuration) {
+export async function createOrUpdateConfiguration(data: Configuration, id: string) {
   try {
     const configuration = configurationSchema.parse(data);
 
-    await prisma.configuration.create({
-      data: configuration,
-    });
+    if (id) {
+      await prisma.configuration.update({
+        where: { id },
+        data: configuration,
+      });
+    } else {
+      await prisma.configuration.create({
+        data: configuration,
+      });
+    }
 
     return {
       success: true,

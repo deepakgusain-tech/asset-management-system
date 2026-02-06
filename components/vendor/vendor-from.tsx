@@ -1,4 +1,4 @@
-"use client";
+            "use client";
 
 import React from "react";
 import { ControllerRenderProps, SubmitHandler, useForm } from "react-hook-form";
@@ -30,8 +30,6 @@ import { VendorStatus } from "@/lib/generated/prisma/enums";
 import { Textarea } from "../ui/textarea";
 import { useRouter } from "next/navigation";
 
-<<<<<<< HEAD
-=======
 export interface Vendor {
   id?: string;
   name: string;
@@ -42,7 +40,6 @@ export interface Vendor {
   status: "ACTIVE" | "INACTIVE";
 }
 
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a
 const VendorForm = ({
   data,
   update = false,

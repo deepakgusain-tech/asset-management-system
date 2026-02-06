@@ -109,20 +109,21 @@ export const vendorDefaultValues = {
   status: VendorStatus.ACTIVE,
   notes: "",
 };
-<<<<<<< HEAD
 
-export const requirementDefaultValues ={
+export const requirementDefaultValues = {
+  manufatured: "",
+  model: "",
   vendorIds: [],
-  configuration: [{ item: "", quantity: "", description: "" }],
-  manufatured:"",
-  model:"",
-  Warranty:"",
-  WarrantyTypes:"",
-  QuatationValidity:"",
-  Delivery:"",
-  status: VendorStatus.ACTIVE,
+  configuration: [
+    {
+      item: "",
+      quantity: "",
+      description: "",
+    },
+  ],
+  warranty: "",
+  warrantyType: "",
+  quotationValidity: "",
+  status: Status.ACTIVE,
   notes: "",
 };
-
-=======
->>>>>>> 3916a672119b866df9e1393234dffac48f6b531a

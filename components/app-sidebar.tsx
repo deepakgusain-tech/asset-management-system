@@ -81,6 +81,16 @@ const data = {
           url: "/admin/vendor",
           icon: BriefcaseBusinessIcon,
         },
+        {
+          title: "Requirements",
+          url: "/admin/requirements",
+          icon: BriefcaseBusinessIcon,
+        },
+        {
+          title: "Procurement",
+          url: "/admin/procurement",
+          icon: BriefcaseBusinessIcon,
+        },
       ]
     },
     {
