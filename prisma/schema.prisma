@@ -1,0 +1,334 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum AssignedDeviceStatus {
+  ASSIGNED
+  NOTASSIGNED
+  RETURNED
+}
+
+enum DeviceStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  RETIRED
+}
+
+enum VendorStatus {
+  ACTIVE
+  INACTIVE
+  BLACKLISTED
+}
+
+model User {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String?
+  email         String    @unique(map: "user_email_idx")
+  emailVerified DateTime?
+  image         String?
+  password      String
+  roleId        String    @db.Uuid
+  accounts      Account[]
+  sessions      Session[]
+  status        Status    @default(ACTIVE)
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Account {
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @id
+  userId       String   @db.Uuid
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Role {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String @unique(map: "role_name_idx")
+  description String
+  status      Status @default(ACTIVE)
+
+  module    Module[]
+  user      User[]
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Module {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String @unique(map: "module_name_idx")
+  description String
+  roleId      String @db.Uuid
+  status      Status @default(ACTIVE)
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model DeviceCategory {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String @unique(map: "device_category_name_idx")
+  purchaseOrderItems PurchaseOrderItem[]
+  description String
+  status      Status @default(ACTIVE)
+
+  device Device[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Device {
+  id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  serialNumber String  @unique
+  description  String?
+
+  status DeviceStatus @default(ACTIVE)
+
+  categoryId String         @db.Uuid
+  category   DeviceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  manufacturer String?
+  model        String?
+  purchaseDate DateTime?
+  warrantyEnd  DateTime?
+
+  device DeviceAssigned[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([status])
+}
+
+model Department {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String     @unique(map: "department_name_idx")
+  description String
+  status      Status     @default(ACTIVE)
+  employee    Employee[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Location {
+  id            String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String     @unique(map: "location_name_idx")
+  streetAddress String
+  city          String
+  state         String
+  postalCode    String
+  country       String
+  latitude      String?
+  longitude     String?
+  employee      Employee[]
+
+  status Status @default(ACTIVE)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model Employee {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  first_name  String
+  last_name   String    @unique
+  email       String?
+  phoneNumber String?
+  dateOfBirth DateTime?
+  hireDate    DateTime?
+  salary      String
+
+  status Status @default(ACTIVE)
+
+  departmentId String     @db.Uuid
+  department   Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+
+  locationId String   @db.Uuid
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  device DeviceAssigned[]
+
+  @@index([departmentId])
+  @@index([locationId])
+  @@index([status])
+}
+
+model DeviceAssigned {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  assignedDate DateTime  @default(now()) @db.Timestamp(6)
+  returnedDate DateTime? @default(now()) @db.Timestamp(6)
+
+  status  AssignedDeviceStatus @default(NOTASSIGNED)
+  remarks String
+
+  deviceId String @db.Uuid
+  device   Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  employeeId String   @db.Uuid
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([deviceId])
+  @@index([employeeId])
+}
+
+model Vendor {
+  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendorCode    String              @unique
+  purchaseOrders PurchaseOrder[]
+  name          String
+  contactPerson String?
+  phone         String?
+  email         String?
+  addressLine1  String?
+  addressLine2  String?
+  city          String?
+  state         String?
+  postalCode    String?
+  country       String?
+  taxId         String?
+  website       String?
+  status        VendorStatus        @default(ACTIVE)
+  notes         String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model Requirement {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  manufatured       String
+  purchaseOrders PurchaseOrder[]
+  model             String
+  configuration     Json?
+  warranty          String
+  notes             String?
+  vendorIds         String[]
+  warrantyType      String?
+  quotationValidity DateTime            @db.Timestamp(6)
+  createdAt         DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime            @updatedAt
+  status            Status              @default(ACTIVE)
+}
+
+model Procurement {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  manufatured       String
+  model             String
+  configuration     Json?
+  warranty          String
+  notes             String?
+  vendorId         String
+  warrantyType      String?
+  quotationValidity DateTime            @db.Timestamp(6)
+  createdAt         DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime            @updatedAt
+  status            Status              @default(ACTIVE)
+  requirementId     String  
+}
+
+
+model Configuration {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name     String?
+  logo     String?
+  favicon  String?
+  email    String?
+  password String?
+}
+
+enum PurchaseOrderStatus {
+  DRAFT
+  SENT
+  APPROVED
+  RECEIVED
+  CANCELLED
+}
+
+model PurchaseOrder {
+  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  poNumber      String              @unique
+  requirementId String              @db.Uuid
+  vendorId      String              @db.Uuid
+  status        PurchaseOrderStatus @default(DRAFT)
+  totalAmount   Float
+
+  requirement Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  items       PurchaseOrderItem[]
+
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  @@index([requirementId])
+  @@index([vendorId])
+  @@index([status])
+}
+
+
+model PurchaseOrderItem {
+  id               String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  purchaseOrderId  String  @db.Uuid
+  deviceCategoryId String  @db.Uuid
+  quantity         Int
+  unitPrice        Float
+  totalPrice       Float
+
+  purchaseOrder  PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  deviceCategory DeviceCategory @relation(fields: [deviceCategoryId], references: [id], onDelete: Cascade)
+
+  @@index([purchaseOrderId])
+  @@index([deviceCategoryId])
+}
+
