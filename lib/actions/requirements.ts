@@ -6,6 +6,7 @@ import { formatError } from "../utils";
 import { requriementsSchema } from "../validators";
 import { sendMail } from "../mail";
 import { requirementEmailTemplate } from "../requirement-template";
+import { getVendorById } from "./vendor";
 
 // get requirement
 export async function getRequirement() {
@@ -20,7 +21,7 @@ export async function getRequirement() {
 export async function createRequirement(data: Requirement) {
   try {
 
-    await prisma.requirement.create({
+    const response =  await prisma.requirement.create({
       data: {
         manufatured: data.manufatured,
         model: data.model,
@@ -34,13 +35,23 @@ export async function createRequirement(data: Requirement) {
       },
     });
 
-    let html = requirementEmailTemplate(data)
+    console.log(response);
+    
 
-    await sendMail({
-      to: "deepak@mail.com",
-      subject : "subject",
-      html,
-    });
+    
+    for (const vendorId of data.vendorIds) {
+      const vendor = await getVendorById(vendorId)
+      
+      let html = requirementEmailTemplate({...data, vendorName : vendor.data?.name as string, vendorId:vendor.data?.id as string, requirementId:response.id as string})
+
+      await sendMail({
+        to: vendor.data?.email as string,
+        subject: "Asset Request – Quotation Required",
+        html,
+      });
+    }
+
+
 
     return {
       success: true,
@@ -77,6 +88,9 @@ export async function getRequirementById(id: string) {
     return {
       success: false,
       message: formatError(error),
+
+
+
     };
   }
 }

@@ -1,13 +1,22 @@
 import nodemailer from "nodemailer";
 
+// // Looking to send emails in production? Check out our Email API/SMTP product!
+// var transport = nodemailer.createTransport({
+//     host: "sandbox.smtp.mailtrap.io",
+//     port: 2525,
+//     auth: {
+//         user: "7e96b9a3755d2e",
+//         pass: "****a174"
+//     }
+// });
 // Looking to send emails in production? Check out our Email API/SMTP product!
 var transport = nodemailer.createTransport({
-    host: "sandbox.smtp.mailtrap.io",
-    port: 2525,
-    auth: {
-        user: "5b2bd83897dfa0",
-        pass: "fd593e7f58bc8d"
-    }
+  host: "sandbox.smtp.mailtrap.io",
+  port: 2525,
+  auth: {
+    user: "7e96b9a3755d2e",
+    pass: "09cb419003a174"
+  }
 });
 
 export async function sendMail({

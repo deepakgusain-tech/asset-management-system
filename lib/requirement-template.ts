@@ -1,123 +1,157 @@
 type ConfigItem = {
-    item: string;
-    quantity?: string;
-    description?: string;
+  item: string;
+  quantity?: string;
+  description?: string;
 };
 
 type RequirementPayload = {
-    model: string;
-    manufatured: string;
-    warranty: string;
-    warrantyType?: string;
-    quotationValidity: string | Date;
-    notes?: string;
-    configuration: ConfigItem[];
-    vendorNames?: string[];
+  manufatured: string;
+  model: string;
+  warranty: string;
+  warrantyType?: string;
+  quotationValidity: string | Date;
+  notes?: string;
+  configuration: ConfigItem[];
+  vendorName: string;
+  vendorId: string;
+  requirementId: string;
+
 };
 
 export function requirementEmailTemplate(data: RequirementPayload) {
-    const specs = data.configuration
-        .map(
-            (c) => `
-      <tr>
-        <td style="border:1px solid #ddd">${c.item}</td>
-        <td style="border:1px solid #ddd">${c.quantity || "-"}</td>
-        <td style="border:1px solid #ddd">${c.description || "-"}</td>
-      </tr>
-    `,
-        )
-        .join("");
+  const specs = data.configuration
+    .map(
+      (c) => `
+        <tr>
+          <td style="border:1px solid #ddd; padding:6px;">${c.item}</td>
+          <td style="border:1px solid #ddd; padding:6px;">${c.quantity || "-"}</td>
+          <td style="border:1px solid #ddd; padding:6px;">${c.description || "-"}</td>
+        </tr>
+      `
+    )
+    .join("");
 
-    const vendors = data.vendorNames?.length
-        ? data.vendorNames.map((v) => `<p>${v}</p>`).join("")
-        : "<p>N/A</p>";
+  // ✅ Vendor quotation form link
+  const vendorFormLink = `${process.env.NEXT_PUBLIC_APP_URL}/vender-request/${data.requirementId}/${data.vendorId}`;
+    // const vendorFormLink =
+  // `${process.env.NEXT_PUBLIC_APP_URL}/vender-request?rid=${data.requirementId}&vid=${data.vendorId}`;
 
-    return `
-<table width="100%" cellpadding="0" cellspacing="0">
+  return `
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; background:#f4f4f4; padding:20px;">
+
+  <table width="600" align="center" style="background:#ffffff; padding:24px; border-radius:6px;">
+    
+    <tr>
+      <td style="font-size:20px; font-weight:bold;">
+        Asset Request – Quotation Required
+      </td>
+    </tr>
 
     <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; padding:24px; border-radius:6px;">
-          <tr>
-            <td style="font-size:20px; font-weight:bold; padding-bottom:16px;">
-              Asset Request – Quotation Required
-            </td>
-          </tr>
+      <td style="padding-top:16px;">
+        Dear <strong>${data.vendorName}</strong>,
+      </td>
+    </tr>
 
-          <tr>
-            <td style="font-size:14px; line-height:1.6; padding-bottom:12px;">
-              Dear <strong>[Vendor Name]</strong>,
-            </td>
-          </tr>
+    <tr>
+      <td style="padding-top:12px;">
+        We would like to request a quotation for the following asset(s).
+      </td>
+    </tr>
 
+    <!-- BASIC DETAILS -->
+    <tr>
+      <td style="padding-top:16px;">
+        <strong>Asset Details</strong>
+        <table width="100%" cellpadding="6" cellspacing="0" style="border-collapse:collapse; margin-top:8px;">
           <tr>
-            <td style="font-size:14px; line-height:1.6; padding-bottom:12px;">
-              I hope you are doing well.
-            </td>
+            <td><strong>Manufacturer</strong></td>
+            <td>${data.manufatured}</td>
           </tr>
-
           <tr>
-            <td style="font-size:14px; line-height:1.6; padding-bottom:16px;">
-              We would like to request a quotation for the following asset(s). Kindly share your best pricing along with
-              availability and expected delivery timelines.
-            </td>
+            <td><strong>Model</strong></td>
+            <td>${data.model}</td>
           </tr>
-
           <tr>
-            <td style="padding-bottom:16px;">
-              <table width="100%" cellpadding="6" cellspacing="0" style="border-collapse:collapse;">
-                <thead>
-                  <tr>
-                    <th style="border:1px solid #ddd;">Item</th>
-                    <th style="border:1px solid #ddd;">Quantity</th>
-                    <th style="border:1px solid #ddd;">Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                    ${specs}
-                </tbody>
-               
-              </table>
-            </td>
+            <td><strong>Warranty</strong></td>
+            <td>${data.warranty}</td>
           </tr>
-
           <tr>
-            <td style="font-size:14px; line-height:1.6; padding-bottom:12px;">
-              Additionally, please include the following in your response:
-              <ul style="margin:8px 0 0 18px; padding:0;">
-                <li>Unit price and total cost (including applicable taxes)</li>
-                <li>Delivery timeline</li>
-                <li>Warranty / support details</li>
-                <li>Payment terms</li>
-                <li>Quotation validity</li>
-              </ul>
-            </td>
+            <td><strong>Warranty Type</strong></td>
+            <td>${data.warrantyType || "-"}</td>
           </tr>
-
           <tr>
-            <td style="font-size:14px; line-height:1.6; padding-bottom:16px;">
-              If you have any alternative recommendations that meet similar specifications, please feel free to include
-              them as well.
-            </td>
+            <td><strong>Quotation Validity</strong></td>
+            <td>${new Date(data.quotationValidity).toDateString()}</td>
           </tr>
-
-          <tr>
-            <td style="font-size:14px; line-height:1.6; padding-bottom:20px;">
-              Thank you for your support. We look forward to your quotation.
-            </td>
-          </tr>
-
-          <tr>
-            <td style="font-size:14px; line-height:1.6;">
-              Best regards,<br />
-              <strong>Deepak Gusain</strong><br />
-              [Your Designation]<br />
-              [Your Company Name]<br />
-              [Your Phone Number]<br />
-              [Your Email Address]
-            </td>
-          </tr>
-
         </table>
+      </td>
+    </tr>
+
+    <!-- CONFIGURATION TABLE -->
+    <tr>
+      <td style="padding-top:16px;">
+        <strong>Configuration</strong>
+        <table width="100%" cellpadding="6" cellspacing="0" style="border-collapse:collapse; margin-top:8px;">
+          <tr>
+            <th style="border:1px solid #ddd;">Item</th>
+            <th style="border:1px solid #ddd;">Quantity</th>
+            <th style="border:1px solid #ddd;">Description</th>
+          </tr>
+          ${specs}
+        </table>
+      </td>
+    </tr>
+
+    <!-- NOTES -->
+    <tr>
+      <td style="padding-top:16px;">
+        <strong>Additional Notes</strong><br/>
+        ${data.notes || "N/A"}
+      </td>
+    </tr>
+
+    <!-- CTA BUTTON -->
+    <tr>
+      <td style="padding-top:24px; text-align:center;">
+        <a
+          href="${vendorFormLink}"
+          target="_blank"
+          style="
+            display:inline-block;
+            padding:12px 20px;
+            background-color:#2563eb;
+            color:#ffffff;
+            text-decoration:none;
+            border-radius:4px;
+            font-weight:bold;
+          "
+        >
+          Submit Your Quotation
+        </a>
+      </td>
+    </tr>
+
+    <!-- FALLBACK LINK -->
+    <tr>
+      <td style="padding-top:12px; font-size:12px; color:#555; text-align:center;">
+        Or copy and paste this link into your browser:<br/>
+        <a href="${vendorFormLink}">${vendorFormLink}</a>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding-top:24px;">
+        Best regards,<br/>
+        <strong>Asset Management Team</strong>
+      </td>
+    </tr>
+
+  </table>
+
+</body>
+</html>
 `;
 }
