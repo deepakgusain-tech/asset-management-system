@@ -9,6 +9,7 @@ import {
   BuildingIcon,
   Command,
   ComputerIcon,
+  FileText,
   Frame,
   GalleryVerticalEnd,
   Laptop2Icon,
@@ -90,6 +91,11 @@ const data = {
           title: "Procurement",
           url: "/admin/procurement",
           icon: BriefcaseBusinessIcon,
+        },
+        {
+          title: "Purchase Order",
+          url: "/admin/purchase-order",
+          icon: FileText,
         },
       ]
     },

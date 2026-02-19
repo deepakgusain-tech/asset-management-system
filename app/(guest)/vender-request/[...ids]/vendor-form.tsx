@@ -26,9 +26,8 @@ export default function VendorForm({
   requirement: Requirement;
   vendorId: string;
 }) {
-  console.log("Requirement Data:", requirement);
 
-  // ✅ Safely parse configuration
+  
   let parsedConfig: any[] = [];
   try {
     parsedConfig = JSON.parse(requirement.configuration as any);
@@ -44,15 +43,15 @@ export default function VendorForm({
     }))
   );
 
-  // Extra quotation fields
   const [validTill, setValidTill] = useState("");
   const [deliveryDays, setDeliveryDays] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const [gst, setGst] = useState(0);
   const [additionalCharges, setAdditionalCharges] = useState(0);
   const [remarks, setRemarks] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Calculations
+   
   const subtotal = items.reduce(
     (sum, item) => sum + item.quantity * item.price,
     0
@@ -69,6 +68,60 @@ export default function VendorForm({
     );
   };
 
+  
+  const handleSubmit = async () => {
+    try {
+      if (!validTill) {
+        alert("Please select quotation valid date");
+        return;
+      }
+
+      setLoading(true);
+
+      const response = await fetch("/api/quotation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          vendorId,
+          requirementId: requirement.id,
+          items,
+          validTill: new Date(validTill),
+          deliveryDays: Number(deliveryDays),
+          paymentTerms,
+          gst,
+          additionalCharges,
+          subtotal,
+          gstAmount,
+          grandTotal,
+          remarks,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Submission failed");
+      }
+
+      alert("Quotation submitted successfully 🎉");
+
+   
+      setValidTill("");
+      setDeliveryDays("");
+      setPaymentTerms("");
+      setGst(0);
+      setAdditionalCharges(0);
+      setRemarks("");
+
+    } catch (error: any) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-muted/40 flex justify-center p-6">
       <Card className="w-full max-w-5xl">
@@ -83,30 +136,15 @@ export default function VendorForm({
 
         <CardContent className="space-y-8">
 
-          {/* Requirement Info */}
+         
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label>Manufactured</label>
-              <Input value={requirement.manufatured ?? ""} readOnly />
-            </div>
-
-            <div>
-              <label>Model</label>
-              <Input value={requirement.model ?? ""} readOnly />
-            </div>
-
-            <div>
-              <label>Warranty</label>
-              <Input value={requirement.warranty ?? ""} readOnly />
-            </div>
-
-            <div>
-              <label>Warranty Type</label>
-              <Input value={requirement.warrantyType ?? ""} readOnly />
-            </div>
+            <Input value={requirement.manufatured ?? ""} readOnly />
+            <Input value={requirement.model ?? ""} readOnly />
+            <Input value={requirement.warranty ?? ""} readOnly />
+            <Input value={requirement.warrantyType ?? ""} readOnly />
           </div>
 
-          {/* Requirements Table */}
+        
           <div>
             <h3 className="font-semibold mb-4">Requirements</h3>
 
@@ -132,71 +170,51 @@ export default function VendorForm({
             ))}
           </div>
 
-          {/* Quotation Extra Details */}
+   
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              type="date"
+              value={validTill}
+              onChange={(e) => setValidTill(e.target.value)}
+            />
 
-            <div>
-              <label>Quotation Valid Till</label>
-              <Input
-                type="date"
-                value={validTill}
-                onChange={(e) => setValidTill(e.target.value)}
-              />
-            </div>
+            <Input
+              type="number"
+              value={deliveryDays}
+              onChange={(e) => setDeliveryDays(e.target.value)}
+              placeholder="Delivery Days"
+            />
 
-            <div>
-              <label>Delivery (Days)</label>
-              <Input
-                type="number"
-                value={deliveryDays}
-                onChange={(e) => setDeliveryDays(e.target.value)}
-                placeholder="e.g. 7"
-              />
-            </div>
+            <Input
+              value={paymentTerms}
+              onChange={(e) => setPaymentTerms(e.target.value)}
+              placeholder="Payment Terms"
+            />
 
-            <div>
-              <label>Payment Terms</label>
-              <Input
-                value={paymentTerms}
-                onChange={(e) => setPaymentTerms(e.target.value)}
-                placeholder="e.g. 50% Advance"
-              />
-            </div>
+            <Input
+              type="number"
+              value={gst}
+              onChange={(e) => setGst(Number(e.target.value))}
+              placeholder="GST %"
+            />
 
-            <div>
-              <label>GST (%)</label>
-              <Input
-                type="number"
-                value={gst}
-                onChange={(e) => setGst(Number(e.target.value))}
-                placeholder="e.g. 18"
-              />
-            </div>
-
-            <div>
-              <label>Additional Charges</label>
-              <Input
-                type="number"
-                value={additionalCharges}
-                onChange={(e) =>
-                  setAdditionalCharges(Number(e.target.value))
-                }
-                placeholder="Shipping / Handling"
-              />
-            </div>
-
-          </div>
-
-          {/* Remarks */}
-          <div>
-            <label>Remarks</label>
-            <Textarea
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
+            <Input
+              type="number"
+              value={additionalCharges}
+              onChange={(e) =>
+                setAdditionalCharges(Number(e.target.value))
+              }
+              placeholder="Additional Charges"
             />
           </div>
+ 
+          <Textarea
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            placeholder="Remarks"
+          />
 
-          {/* Total Breakdown */}
+     
           <div className="text-right space-y-1 font-medium">
             <div>Subtotal: ₹{subtotal.toFixed(2)}</div>
             <div>GST: ₹{gstAmount.toFixed(2)}</div>
@@ -205,8 +223,11 @@ export default function VendorForm({
             </div>
           </div>
 
+         
           <div className="flex justify-end">
-            <Button>Submit Quotation</Button>
+            <Button onClick={handleSubmit} disabled={loading}>
+              {loading ? "Submitting..." : "Submit Quotation"}
+            </Button>
           </div>
 
         </CardContent>

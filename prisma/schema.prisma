@@ -31,6 +31,12 @@ enum VendorStatus {
   BLACKLISTED
 }
 
+enum QuotationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -106,11 +112,11 @@ model Module {
 }
 
 model DeviceCategory {
-  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String @unique(map: "device_category_name_idx")
+  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String              @unique(map: "device_category_name_idx")
   purchaseOrderItems PurchaseOrderItem[]
-  description String
-  status      Status @default(ACTIVE)
+  description        String
+  status             Status              @default(ACTIVE)
 
   device Device[]
 
@@ -225,62 +231,63 @@ model DeviceAssigned {
 }
 
 model Vendor {
-  id            String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  vendorCode    String              @unique
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  vendorCode     String          @unique
   purchaseOrders PurchaseOrder[]
-  name          String
-  contactPerson String?
-  phone         String?
-  email         String?
-  addressLine1  String?
-  addressLine2  String?
-  city          String?
-  state         String?
-  postalCode    String?
-  country       String?
-  taxId         String?
-  website       String?
-  status        VendorStatus        @default(ACTIVE)
-  notes         String?
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  quotations Quotation[]
+  name           String
+  contactPerson  String?
+  phone          String?
+  email          String?
+  addressLine1   String?
+  addressLine2   String?
+  city           String?
+  state          String?
+  postalCode     String?
+  country        String?
+  taxId          String?
+  website        String?
+  status         VendorStatus    @default(ACTIVE)
+  notes          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Requirement {
-  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   manufatured       String
-  purchaseOrders PurchaseOrder[]
+  purchaseOrders    PurchaseOrder[]
+  quotations Quotation[]
   model             String
   configuration     Json?
   warranty          String
   notes             String?
   vendorIds         String[]
   warrantyType      String?
-  quotationValidity DateTime            @db.Timestamp(6)
-  createdAt         DateTime            @default(now()) @db.Timestamp(6)
-  updatedAt         DateTime            @updatedAt
-  status            Status              @default(ACTIVE)
+  quotationValidity DateTime        @db.Timestamp(6)
+  createdAt         DateTime        @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime        @updatedAt
+  status            Status          @default(ACTIVE)
 }
 
 model Procurement {
-  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   manufatured       String
   model             String
   configuration     Json?
   warranty          String
   notes             String?
-  vendorId         String
+  vendorId          String
   warrantyType      String?
-  quotationValidity DateTime            @db.Timestamp(6)
-  createdAt         DateTime            @default(now()) @db.Timestamp(6)
-  updatedAt         DateTime            @updatedAt
-  status            Status              @default(ACTIVE)
-  requirementId     String  
+  quotationValidity DateTime @db.Timestamp(6)
+  createdAt         DateTime @default(now()) @db.Timestamp(6)
+  updatedAt         DateTime @updatedAt
+  status            Status   @default(ACTIVE)
+  requirementId     String
 }
 
-
 model Configuration {
-  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name     String?
   logo     String?
   favicon  String?
@@ -304,8 +311,8 @@ model PurchaseOrder {
   status        PurchaseOrderStatus @default(DRAFT)
   totalAmount   Float
 
-  requirement Requirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
-  vendor      Vendor      @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  requirement Requirement         @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  vendor      Vendor              @relation(fields: [vendorId], references: [id], onDelete: Cascade)
   items       PurchaseOrderItem[]
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
@@ -316,11 +323,10 @@ model PurchaseOrder {
   @@index([status])
 }
 
-
 model PurchaseOrderItem {
-  id               String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  purchaseOrderId  String  @db.Uuid
-  deviceCategoryId String  @db.Uuid
+  id               String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  purchaseOrderId  String @db.Uuid
+  deviceCategoryId String @db.Uuid
   quantity         Int
   unitPrice        Float
   totalPrice       Float
@@ -332,4 +338,30 @@ model PurchaseOrderItem {
   @@index([deviceCategoryId])
 }
 
- 
+model Quotation {
+  id            String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  vendorId      String @db.Uuid
+  requirementId String @db.Uuid
+
+  items             Json
+  validTill         DateTime
+  deliveryDays      Int
+  paymentTerms      String
+  gst               Float
+  additionalCharges Float
+  subtotal          Float
+  gstAmount         Float
+  grandTotal        Float
+  remarks           String?
+
+  status QuotationStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([vendorId])
+  @@index([requirementId])
+   vendor      Vendor      @relation(fields: [vendorId], references: [id])
+  requirement Requirement @relation(fields: [requirementId], references: [id])
+}

@@ -1,49 +1,75 @@
 "use server";
 
 import { prisma } from "@/lib/db/prisma-helper";
-import {
-  createPurchaseOrderSchema
-} from "@/lib/validators";
+import { createPurchaseOrderSchema } from "@/lib/validators";
 import { PurchaseOrderStatus } from "../generated/prisma/enums";
+import { revalidatePath } from "next/cache";
 
-/**
- * CREATE PURCHASE ORDER
- */
+ 
 export async function createPurchaseOrder(input: unknown) {
-  // 1️⃣ Validate input using Zod
   const data = createPurchaseOrderSchema.parse(input);
 
-  // 2️⃣ Calculate total amount
   const totalAmount = data.items.reduce(
-    (sum, item) => sum + Number(item.quantity) * Number(item.unitPrice),
+    (sum, item) =>
+      sum + Number(item.quantity) * Number(item.unitPrice),
     0
   );
 
-  // 3️⃣ Create Purchase Order with items
   const purchaseOrder = await prisma.purchaseOrder.create({
     data: {
       poNumber: `PO-${Date.now()}`,
       requirementId: data.requirementId,
       vendorId: data.vendorId,
       totalAmount,
-      status: PurchaseOrderStatus.DRAFT,
+      status: PurchaseOrderStatus.DRAFT,  
       items: {
-        create: data.items.map(item => ({
+        create: data.items.map((item) => ({
           deviceCategoryId: item.deviceCategoryId,
           quantity: Number(item.quantity),
           unitPrice: Number(item.unitPrice),
-          totalPrice: Number(item.quantity) * Number(item.unitPrice)
-        }))
-      }
-    }
+          totalPrice:
+            Number(item.quantity) *
+            Number(item.unitPrice),
+        })),
+      },
+    },
   });
+
+  revalidatePath("/admin/purchase-order");
 
   return purchaseOrder;
 }
 
-/**
- * FETCH PURCHASE ORDERS (LIST PAGE)
- */
+ 
+export async function updatePurchaseOrderStatus(id: string) {
+  const po = await prisma.purchaseOrder.findUnique({
+    where: { id },
+  });
+
+  if (!po) {
+    throw new Error("Purchase Order not found");
+  }
+
+  
+  if (po.status === PurchaseOrderStatus.DRAFT) {
+    await prisma.purchaseOrder.update({
+      where: { id },
+      data: { status: PurchaseOrderStatus.SENT },
+    });
+  } else if (po.status === PurchaseOrderStatus.SENT) {
+    await prisma.purchaseOrder.update({
+      where: { id },
+      data: { status: PurchaseOrderStatus.RECEIVED },
+    });
+  } else {
+    throw new Error(
+      "Purchase Order cannot be modified further"
+    );
+  }
+
+  revalidatePath("/admin/purchase-order");
+}
+ 
 export async function getPurchaseOrders() {
   return prisma.purchaseOrder.findMany({
     orderBy: { createdAt: "desc" },
@@ -52,16 +78,14 @@ export async function getPurchaseOrders() {
       requirement: true,
       items: {
         include: {
-          deviceCategory: true
-        }
-      }
-    }
+          deviceCategory: true,
+        },
+      },
+    },
   });
 }
 
-/**
- * FETCH SINGLE PURCHASE ORDER
- */
+ 
 export async function getPurchaseOrderById(id: string) {
   return prisma.purchaseOrder.findUnique({
     where: { id },
@@ -70,9 +94,9 @@ export async function getPurchaseOrderById(id: string) {
       requirement: true,
       items: {
         include: {
-          deviceCategory: true
-        }
-      }
-    }
+          deviceCategory: true,
+        },
+      },
+    },
   });
 }
