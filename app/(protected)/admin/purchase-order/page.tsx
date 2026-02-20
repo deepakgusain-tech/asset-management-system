@@ -9,14 +9,69 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-import {
-  getPurchaseOrders,
-  updatePurchaseOrderStatus,
-} from "@/lib/actions/purchase-order";
+import { sendMail } from "@/lib/mail";
+import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/db/prisma-helper";
+import { purchaseOrderTemplate } from "@/lib/purchaseorder-template";
 
 export default async function PurchaseOrderPage() {
-  const purchaseOrders = await getPurchaseOrders();
+  const purchaseOrders = await prisma.purchaseOrder.findMany({
+    include: {
+      vendor: true,
+      requirement: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  async function handleUpdateStatus(id: string) {
+    "use server";
+
+    const po = await prisma.purchaseOrder.findUnique({
+      where: { id },
+      include: {
+        vendor: true,
+        requirement: true,
+      },
+    });
+
+    if (!po) return;
+
+
+    if (po.status === "DRAFT") {
+      const html = purchaseOrderTemplate({
+        vendorName: po.vendor.name,
+        poNumber: po.poNumber,
+        poDate: po.createdAt.toDateString(),
+        totalAmount: po.totalAmount,
+        deliveryDate: "As per agreed terms",
+      });
+
+      if (!po.vendor.email) {
+        throw new Error("Vendor email not found");
+      }
+
+      await sendMail({
+        to: po.vendor.email, 
+        subject: `Purchase Order Approved - PO No ${po.poNumber}`,
+        html,
+      });
+      await prisma.purchaseOrder.update({
+        where: { id },
+        data: { status: "SENT" },
+      });
+    }
+
+    else if (po.status === "SENT") {
+      await prisma.purchaseOrder.update({
+        where: { id },
+        data: { status: "RECEIVED" },
+      });
+    }
+
+    revalidatePath("/purchase-order");
+  }
 
   return (
     <div className="space-y-6">
@@ -46,7 +101,6 @@ export default async function PurchaseOrderPage() {
                   <TableCell className="font-medium">
                     {po.poNumber}
                   </TableCell>
-
                   <TableCell>{po.vendor.name}</TableCell>
 
                   <TableCell>{po.requirement.model}</TableCell>
@@ -61,66 +115,48 @@ export default async function PurchaseOrderPage() {
                   <TableCell>
                     <Badge
                       variant="outline"
-                      className={`px-3 py-1 text-xs font-medium ${
-                        po.status === "DRAFT"
+                      className={`px-3 py-1 text-xs font-medium ${po.status === "DRAFT"
                           ? "bg-gray-100 text-gray-700"
                           : po.status === "SENT"
-                          ? "bg-blue-100 text-blue-700"
-                          : po.status === "RECEIVED"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-muted"
-                      }`}
+                            ? "bg-blue-100 text-blue-700"
+                            : po.status === "RECEIVED"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-muted"
+                        }`}
                     >
                       {po.status}
                     </Badge>
                   </TableCell>
 
-                 
                   <TableCell>
                     <div className="flex items-center justify-end gap-3">
-
-                   
-                      <form
-                        action={async () => {
-                          "use server";
-                          await updatePurchaseOrderStatus(po.id);
-                        }}
-                      >
+                      <form action={handleUpdateStatus.bind(null, po.id)}>
                         <Button
                           type="submit"
                           size="sm"
                           disabled={po.status !== "DRAFT"}
-                          className={`min-w-[110px] transition-opacity ${
-                            po.status !== "DRAFT"
+                          className={`min-w-[110px] ${po.status !== "DRAFT"
                               ? "opacity-50 cursor-not-allowed"
                               : ""
-                          }`}
+                            }`}
                         >
                           Send
                         </Button>
                       </form>
 
-                       
-                      <form
-                        action={async () => {
-                          "use server";
-                          await updatePurchaseOrderStatus(po.id);
-                        }}
-                      >
+                      <form action={handleUpdateStatus.bind(null, po.id)}>
                         <Button
                           type="submit"
                           size="sm"
                           disabled={po.status !== "SENT"}
-                          className={`min-w-[140px] bg-purple-600 hover:bg-purple-700 transition-opacity ${
-                            po.status !== "SENT"
+                          className={`bg-purple-600 hover:bg-purple-700 ${po.status !== "SENT"
                               ? "opacity-50 cursor-not-allowed"
                               : ""
-                          }`}
+                            }`}
                         >
                           Mark Received
                         </Button>
                       </form>
-
                     </div>
                   </TableCell>
                 </TableRow>
