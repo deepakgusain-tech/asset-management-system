@@ -21,7 +21,7 @@ import { createRole, updateRole } from '@/lib/actions/role-action';
 
 const RoleForm = ({ data, update = false }: { data?: Role, update: boolean }) => {
     const router = useRouter()
-    const id = data?.id;
+    const id: string | undefined = data?.id;
 
     const form = useForm<z.infer<typeof roleSchema>>({
         resolver: zodResolver(roleSchema),

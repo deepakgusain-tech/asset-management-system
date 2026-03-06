@@ -1,7 +1,7 @@
 "use client";
 
 import { departmentSchema, moduleSchema } from "@/lib/validators";
-import { AppModule } from "@/types";
+import { Module as AppModule } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { ControllerRenderProps, SubmitHandler, useForm } from "react-hook-form";

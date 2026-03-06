@@ -18,11 +18,11 @@ export async function createOrUpdateConfiguration(data: Configuration, id: strin
     if (id) {
       await prisma.configuration.update({
         where: { id },
-        data: configuration,
+        data: configuration as any,
       });
     } else {
       await prisma.configuration.create({
-        data: configuration,
+        data: configuration as any,
       });
     }
 

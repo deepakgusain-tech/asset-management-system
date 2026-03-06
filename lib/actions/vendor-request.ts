@@ -88,6 +88,8 @@ export async function submitVendorRequest(
       quotationValidity,
       configuration: configuration ? JSON.parse(configuration) : [],
       vendorName,
+      vendorId,
+      requirementId: requirement.id,
     }),
   });
 

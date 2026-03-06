@@ -17,7 +17,7 @@ import {
 import z from "zod";
 
 export type User = z.infer<typeof userSchema>
-export type Role = z.infer<typeof roleSchema> & { status: boolean }
+export type Role = z.infer<typeof roleSchema>
 export type Module = z.infer<typeof moduleSchema>
 export type DeviceCategory = z.infer<typeof deviceCateorySchema>
 export type Device = z.infer<typeof deviceSchema>

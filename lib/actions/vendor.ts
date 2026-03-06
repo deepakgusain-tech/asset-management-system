@@ -20,7 +20,7 @@ export async function createVendor(data: Vendor) {
     const vendor = vendorSchema.parse(data);
 
     await prisma.vendor.create({
-      data: vendor,
+      data: vendor as any,
     });
 
     return {
@@ -69,7 +69,7 @@ export async function updateVendor(data: Vendor, id: string) {
 
     await prisma.vendor.update({
       where: { id },
-      data: vendor,
+      data: vendor as any,
     });
 
     return {
