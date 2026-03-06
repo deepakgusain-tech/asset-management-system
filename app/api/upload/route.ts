@@ -6,12 +6,13 @@ import crypto from "crypto";
 export async function POST(req: Request) {
     const formData = await req.formData();
 
-    const data = Object.fromEntries(formData.entries())    
+     console.log("FORM DATA ENTRIES:");
+  for (const [key, value] of formData.entries()) {
+    console.log(key, value);
+  }
 
+  
     const file = formData.get("image") as File;
-
-    console.log(file);
-    
 
     if (!file) {
         return NextResponse.json({ message: "No image uploaded" }, { status: 400 });
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
     // Validate type
     if (!file.type.startsWith("image/")) {
         return NextResponse.json(
-            { message: "Invalid file type" , success: false},
+            { message: "Invalid file type" },
             { status: 400 }
         );
     }
@@ -28,7 +29,7 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadDir = path.join(process.cwd(), "public/uploads/images");
+    const uploadDir = path.join(process.cwd(), "public/uploads/user");
     await fs.mkdir(uploadDir, { recursive: true });
 
     const ext = file.name.split(".").pop();
@@ -37,8 +38,7 @@ export async function POST(req: Request) {
     await fs.writeFile(path.join(uploadDir, filename), buffer);
 
     return NextResponse.json({
-        success: true,
         message: "Image uploaded successfully",
-        url: `/uploads/images/${filename}`,
+        url: `/uploads/user/${filename}`,
     });
 }
