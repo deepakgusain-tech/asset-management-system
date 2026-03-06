@@ -20,7 +20,7 @@ const ModuleCreate = async() => {
                 </div>
             </CardHeader>
             <CardContent>
-                <ModuleForm update={false} roles={roles} />
+                <ModuleForm update={false} roles ={roles} />
             </CardContent>
         </Card>
     )

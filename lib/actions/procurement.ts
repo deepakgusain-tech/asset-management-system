@@ -35,7 +35,7 @@ export async function createProcurement(data: Procurement) {
       },
     });
 
-    let html = requirementEmailTemplate(data)
+    let html = requirementEmailTemplate(data as any)
 
     await sendMail({
       to: "deepak@mail.com",
@@ -89,7 +89,7 @@ export async function updateProcurement(data: Requirement, id: string) {
 
     await prisma.requirement.update({
       where: { id },
-      data: requirement,
+      data: requirement as any,
     });
 
     return {

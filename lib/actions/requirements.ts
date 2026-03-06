@@ -102,7 +102,7 @@ export async function updateRequirement(data: Requirement, id: string) {
 
     await prisma.requirement.update({
       where: { id },
-      data: requirement,
+      data: requirement as any,
     });
 
     return {

@@ -1,7 +1,8 @@
 "use client";
 
 import { moduleSchema } from "@/lib/validators";
-import { Module, Role } from "@/types";
+import { Module } from "@/types";
+import { Role } from "@/lib/generated/prisma/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { ControllerRenderProps, SubmitHandler, useForm } from "react-hook-form";
