@@ -163,23 +163,25 @@ const data = {
   ],
 };
 
-type AppSidebarProps = {
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   user?: {
-    name?: string | null
-    email?: string | null
-    image?: string | null
-  }
-} & React.ComponentProps<typeof Sidebar>
+    name?: string;
+    email?: string;
+    image?: string;
+  };
+};
 
 export function AppSidebar({ user, ...props }: AppSidebarProps) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" user={user} {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
+
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser
           user={{
@@ -189,6 +191,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
           }}
         />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );
