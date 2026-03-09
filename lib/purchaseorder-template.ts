@@ -54,7 +54,7 @@ export function purchaseOrderTemplate({
     <p>
       Best Regards,<br/>
       Procurement Department<br/>
-      Asset Management System
+      Asset Management System 
     </p>
   </div>
   `;

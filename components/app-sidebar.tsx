@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   AudioWaveform,
   BookOpen,
@@ -27,34 +27,29 @@ import {
   User2,
   UserCog,
   UserPlus,
-} from "lucide-react"
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavMain } from "@/components/nav-main";
+import { NavUser } from "@/components/nav-user";
+import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { APP_NAME } from "@/lib/constants"
-import { IconTableSpark } from "@tabler/icons-react"
+} from "@/components/ui/sidebar";
+import { APP_NAME } from "@/lib/constants";
+import { IconTableSpark } from "@tabler/icons-react";
 
 // This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   teams: [
     {
       name: APP_NAME,
       logo: GalleryVerticalEnd,
       plan: "",
-    }
+    },
   ],
   navMain: [
     {
@@ -97,7 +92,7 @@ const data = {
           url: "/admin/purchase-order",
           icon: FileText,
         },
-      ]
+      ],
     },
     {
       title: "Employee",
@@ -119,7 +114,7 @@ const data = {
           url: "/admin/location",
           icon: LocationEdit,
         },
-      ]
+      ],
     },
     {
       title: "User",
@@ -141,13 +136,13 @@ const data = {
           url: "/admin/module",
           icon: IconTableSpark,
         },
-      ]
+      ],
     },
     {
       title: "Configuration",
       url: "/admin/configuration",
       icon: SettingsIcon,
-    }
+    },
   ],
   projects: [
     {
@@ -166,10 +161,17 @@ const data = {
       icon: Map,
     },
   ],
-}
+};
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type AppSidebarProps = {
+  user?: {
+    name?: string | null
+    email?: string | null
+    image?: string | null
+  }
+} & React.ComponentProps<typeof Sidebar>
 
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -179,9 +181,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={{
+            name: user?.name ?? "User",
+            email: user?.email ?? "",
+            avatar: user?.image ?? "",
+          }}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
