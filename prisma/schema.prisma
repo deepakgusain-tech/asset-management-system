@@ -37,6 +37,15 @@ enum QuotationStatus {
   REJECTED
 }
 
+enum DeviceState {
+  AVAILABLE
+  ASSIGNED
+  REPAIR
+  REPAIRING
+  RETIRED
+}
+
+
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name          String?
@@ -129,6 +138,8 @@ model Device {
   name         String
   serialNumber String  @unique
   description  String?
+  deviceState DeviceState @default(AVAILABLE)
+  
 
   status DeviceStatus @default(ACTIVE)
 
@@ -141,12 +152,27 @@ model Device {
   warrantyEnd  DateTime?
 
   device DeviceAssigned[]
+  histories   DeviceHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([categoryId])
   @@index([status])
+  @@index([deviceState])
+  deviceRepairs DeviceRepair[]
+}
+
+
+model DeviceHistory {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  deviceId    String   @db.Uuid
+  employeeId  String?  @db.Uuid
+  actionType  String
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  device      Device   @relation(fields: [deviceId], references: [id])
 }
 
 model Department {
@@ -178,6 +204,21 @@ model Location {
   updatedAt DateTime @updatedAt
 
   @@index([status])
+}
+
+model DeviceRepair {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  deviceId      String   @db.Uuid
+  vendor        String
+  cost          Float
+  notes         String?
+
+  status        String   @default("REPAIRING")
+
+  createdAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 }
 
 model Employee {
@@ -212,7 +253,7 @@ model DeviceAssigned {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
   assignedDate DateTime  @default(now()) @db.Timestamp(6)
-  returnedDate DateTime? @default(now()) @db.Timestamp(6)
+  returnedDate DateTime?
 
   status  AssignedDeviceStatus @default(NOTASSIGNED)
   remarks String
@@ -291,8 +332,12 @@ model Configuration {
   name     String?
   logo     String?
   favicon  String?
-  email    String?
-  password String?
+
+  smtpHost     String
+  smtpPort     Int
+  smtpUser     String
+  smtpPassword String
+  fromEmail    String
 }
 
 enum PurchaseOrderStatus {

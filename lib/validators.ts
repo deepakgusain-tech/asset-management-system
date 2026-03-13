@@ -55,6 +55,13 @@ export const deviceSchema = z.object({
   serialNumber: z.string().min(1, "Device serial number is required"),
   description: z.string().min(1, "Device description is required"),
   status: z.enum(Object.values(Status)),
+  deviceState: z.enum([
+  "AVAILABLE",
+  "ASSIGNED",
+  "REPAIR",
+  "REPAIRING",
+  "RETIRED"
+]).optional().default("AVAILABLE"),
   categoryId: z.string().min(1, "Device categoryid is required"),
   manufacturer: z.string().min(1, "Device manufacturer is required"),
   model: z.string().min(1, "Device model is required"),
@@ -200,8 +207,13 @@ export const configurationSchema = z.object({
   name: z.string().optional(),
   logo: z.union([z.instanceof(File), z.string()]).optional(),
   favicon: z.union([z.instanceof(File), z.string()]).optional(),
-  email: z.string().optional(),
-  password: z.string().optional(),
+  smtpHost: z.string().min(1),
+  smtpPort: z.coerce.number(),
+
+  smtpUser: z.string().min(1),
+  smtpPassword: z.string().min(1),
+
+  fromEmail: z.string().email()
 })
 
 export const purchaseOrderItemSchema = z.object({

@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
 import { ControllerRenderProps, SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
+import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { Textarea } from '../ui/textarea';
@@ -28,7 +28,7 @@ const DeviceForm = ({ data, update = false, categories }: { data?: Device, updat
 
     const form = useForm<z.infer<typeof deviceSchema>>({
         resolver: zodResolver(deviceSchema),
-        defaultValues: data || deviceDefaultValues
+        defaultValues: (data ?? deviceDefaultValues) as z.infer<typeof deviceSchema>
     })
 
     const [isPending, startTransition] = React.useTransition()

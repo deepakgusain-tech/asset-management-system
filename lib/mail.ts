@@ -1,27 +1,37 @@
 import nodemailer from "nodemailer";
-
-var transport = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
-  auth: {
-    user: "e0635acc4f418b",
-    pass: "7327a51f568ffc"
-  }
-});
+// import { prisma } from "@/lib/db/prisma-helper";
+import { prisma } from "@/lib/db/prisma-helper";
 
 export async function sendMail({
+  to,
+  subject,
+  html,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+}) {
+
+  const config = await prisma.configuration.findFirst();
+
+  if (!config) {
+    throw new Error("Email configuration not set");
+  }
+
+  const transport = nodemailer.createTransport({
+    host: config.smtpHost,
+    port: Number(config.smtpPort),
+    secure: false,
+    auth: {
+      user: config.smtpUser,
+      pass: config.smtpPassword,
+    },
+  } as any);
+
+  return transport.sendMail({
+    from: `Asset Management <${config.fromEmail}>`,
     to,
     subject,
     html,
-}: {
-    to: string;
-    subject: string;
-    html: string;
-}) {
-    return transport.sendMail({
-        from: `Asset Management <deepak@gmail.com>`,
-        to,
-        subject,
-        html,
-    });
+  });
 }

@@ -51,6 +51,7 @@ export const deviceDefaultValues = {
   serialNumber: "",
   description: "",
   status: DeviceStatus.ACTIVE,
+  deviceState: "AVAILABLE",
   categoryId: "",
   manufacturer: "",
   model: "",

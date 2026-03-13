@@ -6,121 +6,198 @@ import { deviceCateorySchema, deviceSchema } from "../validators";
 import { formatError } from "../utils";
 
 // get device categories
-export async function getDevice() {
-    return await prisma.device.findMany({
-        orderBy: {
-            createdAt: 'desc'
-        },
-    })
+
+export async function getDevice(): Promise<Device[]> {
+  const devices = await prisma.device.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return devices as unknown as Device[];
 }
 
-// create device 
+// create device
 export async function createDevice(data: Device) {
+  try {
+    const deviceData = deviceSchema.parse(data);
 
-    try {
+    const device = await prisma.$transaction(async (tx) => {
+      const createdDevice = await tx.device.create({
+        data: {
+          name: deviceData.name,
+          serialNumber: deviceData.serialNumber,
+          description: deviceData.description,
+          status: deviceData.status,
+          categoryId: deviceData.categoryId,
+          manufacturer: deviceData.manufacturer,
+          model: deviceData.model,
+          purchaseDate: deviceData.purchaseDate,
+          warrantyEnd: deviceData.warrantyEnd,
+        },
+      });
 
-        const device = deviceSchema.parse(data)
+      await tx.deviceHistory.create({
+        data: {
+          actionType: "CREATED",
+          notes: "Device added to inventory",
+          device: {
+            connect: { id: createdDevice.id },
+          },
+        },
+      });
 
-        await prisma.device.create({
-            data: {
-                name: device.name,
-                serialNumber: device.serialNumber,
-                description: device.description,
-                status: device.status,
-                categoryId: device.categoryId,
-                manufacturer: device.manufacturer,
-                model: device.model,
-                purchaseDate: device.purchaseDate,
-                warrantyEnd: device.warrantyEnd,
-            }
-        })
+      return createdDevice;
+    });
 
-        return {
-            success: true,
-            message: "Device  created successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return {
+      success: true,
+      message: "Device created successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
 // get device  by id
-export async function getDeviceById(id: string) {
-    try {
 
-        let device = await prisma.device.findFirst({
-            where: { id }
-        })
+export async function getDeviceById(
+  id: string
+): Promise<{ success: boolean; data?: Device; message: string }> {
+  try {
+    const device = await prisma.device.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        histories: true,
+      },
+    });
 
-        if (device) {
-            return {
-                success: true,
-                data: device,
-                message: "Device  created successfully"
-            }
-        }
-
-        return {
-            success: false,
-            message: "Device  not found"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
+    if (device) {
+      return {
+        success: true,
+        data: device as unknown as Device,
+        message: "Device fetched successfully",
+      };
     }
+
+    return {
+      success: false,
+      message: "Device not found",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-// update  device 
+// update  device
 export async function updateDevice(data: Device, id: string) {
-    try {
+  try {
+    const device = deviceCateorySchema.parse(data);
 
-        const device = deviceCateorySchema.parse(data)
+    await prisma.$transaction(async (tx) => {
+      await tx.device.update({
+        where: { id },
+        data: {
+          name: device.name,
+          description: device.description,
+          status: device.status,
+        },
+      });
 
-        await prisma.device.update({
-            where: { id },
-            data: {
-                name: device.name,
-                description: device.description,
-                status: device.status
-            }
-        })
+      await tx.deviceHistory.create({
+        data: {
+          actionType: "UPDATED",
+          notes: "Device details updated",
+          device: {
+            connect: { id },
+          },
+        },
+      });
+    });
 
-        return {
-            success: true,
-            message: "Device  updated successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return {
+      success: true,
+      message: "Device  updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-// delete  device 
-export async function deleteDevice(id: any) {
-    try {
-        await prisma.device.delete({
-            where: { id }
-        })
+// delete  device
+export async function deleteDevice(id: string) {
+  try {
 
-        return {
-            success: true,
-            message: "Device  deleted successfully"
-        }
+    await prisma.$transaction(async (tx) => {
 
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
+      await tx.deviceHistory.deleteMany({
+        where: { deviceId: id }
+      });
+
+      await tx.deviceAssigned.deleteMany({
+        where: { deviceId: id }
+      });
+
+      await tx.device.delete({
+        where: { id }
+      });
+
+    });
+
+    return {
+      success: true,
+      message: "Device deleted permanently",
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
+}
+
+export async function retireDevice(id: string) {
+  try {
+
+    await prisma.$transaction(async (tx) => {
+
+      await tx.device.update({
+        where: { id },
+        data: {
+          deviceState: "RETIRED"
         }
-    }
+      });
+
+      await tx.deviceHistory.create({
+        data: {
+          deviceId: id,
+          actionType: "RETIRED",
+          notes: "Device retired from system"
+        }
+      });
+
+    });
+
+    return {
+      success: true,
+      message: "Device retired successfully"
+    };
+
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error)
+    };
+  }
 }
