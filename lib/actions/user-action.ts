@@ -6,6 +6,7 @@ import { prisma } from "../db/prisma-helper";
 import { userSchema } from "../validators";
 import { formatError } from "../utils";
 import bcrypt from "bcrypt";
+import { createNotification } from "@/lib/actions/notification-action";
 
 export async function getUsers() {
   return await prisma.user.findMany();
@@ -22,7 +23,7 @@ export async function createUser(data: z.infer<typeof userSchema>) {
         : (user.image ?? null); // allow string or null
 
     const hashedPassword = await bcrypt.hash(user.password, 10);
-    await prisma.user.create({
+    const createdUser = await prisma.user.create({
       data: {
         name: user.name,
         email: user.email,
@@ -31,6 +32,12 @@ export async function createUser(data: z.infer<typeof userSchema>) {
         status: user.status,
         roleId: user.roleId,
       },
+    });
+
+    await createNotification({
+      title: "New User Created",
+      message: `${createdUser.name} has been added`,
+      type: "USER_CREATE",
     });
 
     return {

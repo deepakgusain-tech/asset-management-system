@@ -3,6 +3,7 @@ import "./globals.css";
 import { APP_DESCRIPTION, APP_NAME, SERVER_URL } from "@/lib/constants";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner";
+import "@/lib/cron"
 
 export const metadata: Metadata = {
   title: {

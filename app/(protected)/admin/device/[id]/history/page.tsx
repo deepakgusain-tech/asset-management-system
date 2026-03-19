@@ -42,6 +42,18 @@ export default async function DeviceHistoryPage({
   orderBy: {
     createdAt: "desc",
   },
+  });
+
+  const assignments = await prisma.deviceAssigned.findMany({
+  where: {
+    deviceId: deviceId,
+  },
+  include: {
+    employee: true,
+  },
+  orderBy: {
+    assignedDate: "desc",
+  },
 });
 
   const device = await prisma.device.findUnique({
@@ -72,6 +84,7 @@ export default async function DeviceHistoryPage({
       device={device}
       assigned={assigned}
       repairs={repairs}
+      assignments={assignments}
     />
   );
 }

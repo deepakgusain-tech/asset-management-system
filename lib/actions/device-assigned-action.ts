@@ -4,9 +4,33 @@ import { prisma } from "../db/prisma-helper";
 import { deviceAssignedSchema } from "../validators";
 import { formatError } from "../utils";
 import { DeviceAssigned } from "@/types";
+import { createNotification } from "@/lib/actions/notification-action";
+import { auth } from "@/auth";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
+
+async function checkPermission(action: "view" | "create" | "edit" | "delete") {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  const route = "/device-assigned";
+
+  if (!canAccess(user, route, action)) {
+    throw new Error("Access Denied");
+  }
+
+  return user;
+}
+
+
 
 // get device categories
 export async function getAssignedDevices() {
+  await checkPermission("view");
   return await prisma.deviceAssigned.findMany({
     where: {
       status: "ASSIGNED",
@@ -20,23 +44,28 @@ export async function getAssignedDevices() {
 // create device category
 export async function createAssignedDevice(data: DeviceAssigned) {
   try {
+    await checkPermission("create");
     const deviceAssigned = deviceAssignedSchema.parse(data);
 
+    // ✅ FETCH DATA BEFORE TRANSACTION
+    const device = await prisma.device.findUnique({
+      where: { id: deviceAssigned.deviceId },
+    });
+
+    const employee = await prisma.employee.findUnique({
+      where: { id: deviceAssigned.employeeId },
+    });
+
+    if (!device) {
+      throw new Error("Device not found");
+    }
+
+    if (device.deviceState !== "AVAILABLE") {
+      throw new Error("Device is not available for assignment");
+    }
+
+    // ✅ TRANSACTION (DB ONLY)
     await prisma.$transaction(async (tx) => {
-
-      const device = await tx.device.findUnique({
-        where: { id: deviceAssigned.deviceId },
-      });
-
-      if (!device) {
-        throw new Error("Device not found");
-      }
-
-      if (device.deviceState !== "AVAILABLE") {
-        throw new Error("Device is not available for assignment");
-      }
-
-      // create assignment
       await tx.deviceAssigned.create({
         data: {
           deviceId: deviceAssigned.deviceId,
@@ -47,18 +76,11 @@ export async function createAssignedDevice(data: DeviceAssigned) {
         },
       });
 
-      console.log("Updating device state:", deviceAssigned.deviceId);
-
-      // update device state
       await tx.device.update({
         where: { id: deviceAssigned.deviceId },
         data: {
           deviceState: "ASSIGNED",
         },
-      });
-
-      const employee = await tx.employee.findUnique({
-        where: { id: deviceAssigned.employeeId },
       });
 
       await tx.deviceHistory.create({
@@ -73,14 +95,21 @@ export async function createAssignedDevice(data: DeviceAssigned) {
           }`,
         },
       });
+    });
 
+    await createNotification({
+      title: "Device Assigned",
+      message: `${device.name} assigned to ${
+        employee ? `${employee.first_name} ${employee.last_name}` : "employee"
+      }`,
+      type: "DEVICE_ASSIGN",
+      deviceId: deviceAssigned.deviceId,
     });
 
     return {
       success: true,
       message: "Device assigned successfully",
     };
-
   } catch (error) {
     return {
       success: false,
@@ -92,6 +121,7 @@ export async function createAssignedDevice(data: DeviceAssigned) {
 // get device category by id
 export async function getDeviceAssignedById(id: string) {
   try {
+    await checkPermission("view");
     let deviceCategory = await prisma.deviceAssigned.findFirst({
       where: { id },
     });
@@ -119,6 +149,7 @@ export async function getDeviceAssignedById(id: string) {
 // update category device
 export async function updateAssingedDevice(data: DeviceAssigned, id: string) {
   try {
+    await checkPermission("edit");
     const deviceAssigned = deviceAssignedSchema.parse(data);
 
     await prisma.deviceAssigned.update({
@@ -148,6 +179,7 @@ export async function updateAssingedDevice(data: DeviceAssigned, id: string) {
 // delete category device
 export async function deleteDeviceAssigned(id: string) {
   try {
+    await checkPermission("delete");
     const assignment = await prisma.deviceAssigned.findUnique({
       where: { id },
     });
@@ -187,6 +219,7 @@ export async function returnDeviceAction({
   damage,
   remarks,
 }: any) {
+  await checkPermission("edit");
   const assignment = await prisma.deviceAssigned.findUnique({
     where: { id: assignedId },
   });
@@ -203,12 +236,18 @@ export async function returnDeviceAction({
     throw new Error("Assignment does not match device");
   }
 
+  const device = await prisma.device.findUnique({
+    where: { id: deviceId },
+  });
+
   await prisma.$transaction(async (tx) => {
     await tx.deviceAssigned.update({
       where: { id: assignedId },
       data: {
         status: "RETURNED",
         returnedDate: new Date(),
+        damage: damage || "NO",
+        remarks: remarks || null,
       },
     });
 
@@ -225,10 +264,20 @@ export async function returnDeviceAction({
         actionType: "RETURNED",
         notes:
           damage === "YES"
-            ? `Returned with damage. ${remarks}`
-            : `Returned. ${remarks}`,
+            ? `Returned with damage: ${remarks || "No remarks"}`
+            : `Returned safely. ${remarks || ""}`,
       },
     });
+  });
+
+  await createNotification({
+    title: "Device Returned",
+    message:
+      damage === "YES"
+        ? `${device?.name || "Device"} returned with damage`
+        : `${device?.name || "Device"} returned successfully`,
+    type: "DEVICE_RETURN",
+    deviceId: deviceId,
   });
 
   return { success: true };

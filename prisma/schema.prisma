@@ -45,6 +45,15 @@ enum DeviceState {
   RETIRED
 }
 
+enum NotificationType {
+  DEVICE_ASSIGN
+  DEVICE_CREATE
+  REPAIR
+  WARRANTY
+  USER_CREATE
+  DEVICE_RETURN
+}
+
 
 model User {
   id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -101,23 +110,39 @@ model Role {
   description String
   status      Status @default(ACTIVE)
 
-  module    Module[]
   user      User[]
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
+
+  roleModules RoleModule[]
 }
 
 model Module {
   id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String @unique(map: "module_name_idx")
   description String
-  roleId      String @db.Uuid
+  route       String @unique  
   status      Status @default(ACTIVE)
 
-  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  roleModules RoleModule[]
 
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model RoleModule {
+  roleId   String
+  moduleId String
+
+  canView   Boolean @default(true)
+  canCreate Boolean @default(false)
+  canEdit   Boolean @default(false)
+  canDelete Boolean @default(false)
+
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, moduleId])
 }
 
 model DeviceCategory {
@@ -161,6 +186,7 @@ model Device {
   @@index([status])
   @@index([deviceState])
   deviceRepairs DeviceRepair[]
+  notifications Notification[]
 }
 
 
@@ -212,6 +238,7 @@ model DeviceRepair {
   vendor        String
   cost          Float
   notes         String?
+  repairDate    DateTime?
 
   status        String   @default("REPAIRING")
 
@@ -220,6 +247,23 @@ model DeviceRepair {
 
   device Device @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 }
+
+model Notification {
+  id          String   @id @default(uuid())
+  title       String
+  message     String
+  type        NotificationType   // ✅ must use enum
+  isRead      Boolean  @default(false)
+
+  triggerDay  Int?
+
+  deviceId    String?  @db.Uuid
+  device      Device?  @relation(fields: [deviceId], references: [id])
+
+  createdAt   DateTime @default(now())
+}
+
+
 
 model Employee {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -254,6 +298,7 @@ model DeviceAssigned {
 
   assignedDate DateTime  @default(now()) @db.Timestamp(6)
   returnedDate DateTime?
+  damage String?
 
   status  AssignedDeviceStatus @default(NOTASSIGNED)
   remarks String

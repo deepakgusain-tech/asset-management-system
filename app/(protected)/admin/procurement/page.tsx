@@ -11,7 +11,7 @@ const procurementPage = async () => {
   const procurement  = await getProcurement();
 
   return (
-    <Card>
+    <Card className="mt-2">
       <CardHeader>
         <div className="flex justify-between items-center">
           <h1 className="text-lg font-semibold">Procurement</h1>

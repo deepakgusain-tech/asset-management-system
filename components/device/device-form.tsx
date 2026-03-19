@@ -27,7 +27,7 @@ const DeviceForm = ({ data, update = false, categories }: { data?: Device, updat
     const id = data?.id;
 
     const form = useForm<z.infer<typeof deviceSchema>>({
-        resolver: zodResolver(deviceSchema),
+        resolver: zodResolver(deviceSchema) as any,
         defaultValues: (data ?? deviceDefaultValues) as z.infer<typeof deviceSchema>
     })
 

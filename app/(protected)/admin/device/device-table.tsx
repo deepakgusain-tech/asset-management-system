@@ -10,7 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { deleteDevice, retireDevice, getDevice } from "@/lib/actions/device-action";
+import {
+  deleteDevice,
+  retireDevice,
+  getDevice,
+} from "@/lib/actions/device-action";
 import { Device } from "@/types";
 import { format } from "date-fns";
 import { EditIcon, Trash, Info } from "lucide-react";
@@ -26,32 +30,37 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 
-
-const DeviceTable = ({ data }: { data: Device[] }) => {
+const DeviceTable = ({
+  data,
+  canEdit,
+  canDelete,
+}: {
+  data: Device[];
+  canEdit: boolean;
+  canDelete: boolean;
+}) => {
   const [device, setDevice] = useState<Device[]>(data);
   const [open, setOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<string | null>(null);
 
   const retireDeviceHandler = async (id: string) => {
+    let res = await retireDevice(id);
 
-  let res = await retireDevice(id);
+    if (!res?.success) {
+      toast.error("Error", {
+        description: res?.message,
+      });
+    } else {
+      toast.success("Success", {
+        description: res?.message,
+      });
 
-  if (!res?.success) {
-    toast.error("Error", {
-      description: res?.message,
-    });
-  } else {
-    toast.success("Success", {
-      description: res?.message,
-    });
+      const response = await getDevice();
+      setDevice(response as unknown as Device[]);
+    }
+  };
 
-    const response = await getDevice();
-    setDevice(response as unknown as Device[]);
-  }
-
-};
-
-  const deleteDeviceHandler = async (id: any) => {
+  const deleteDeviceHandler = async (id: string) => {
     let res = await deleteDevice(id);
 
     if (!res?.success) {
@@ -82,7 +91,6 @@ const DeviceTable = ({ data }: { data: Device[] }) => {
             <TableHead>Warranty End</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>State</TableHead>
-            <TableHead>CreatedAt</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -130,9 +138,6 @@ const DeviceTable = ({ data }: { data: Device[] }) => {
                     <Badge variant="destructive">RETIRED</Badge>
                   )}
                 </TableCell>
-                <TableCell>
-                  {device.createdAt && format(device.createdAt, "PPP")}
-                </TableCell>
                 <TableCell className="space-x-3">
                   <Link href={`/admin/device/${device.id}/history`}>
                     <Button variant="secondary">
@@ -140,21 +145,25 @@ const DeviceTable = ({ data }: { data: Device[] }) => {
                     </Button>
                   </Link>
 
-                  <Link href={`/admin/device/edit/${device.id}`}>
-                    <Button className="bg-orange-500 hover:bg-orange-600">
-                      <EditIcon />
-                    </Button>
-                  </Link>
+                  {canEdit && (
+                    <Link href={`/admin/device/edit/${device.id}`}>
+                      <Button className="bg-orange-500 hover:bg-orange-600">
+                        <EditIcon />
+                      </Button>
+                    </Link>
+                  )}
 
-                  <Button
-                    variant="destructive"
-                    onClick={() => {
-                      setSelectedDevice(device.id as string);
-                      setOpen(true);
-                    }}
-                  >
-                    <Trash />
-                  </Button>
+                  {canDelete && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        setSelectedDevice(device.id as string);
+                        setOpen(true);
+                      }}
+                    >
+                      <Trash />
+                    </Button>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -169,25 +178,29 @@ const DeviceTable = ({ data }: { data: Device[] }) => {
           </AlertDialogHeader>
 
           <div className="flex gap-3 justify-end">
-            <Button
-              variant="secondary"
-              onClick={() => {
-                if (selectedDevice) retireDeviceHandler(selectedDevice);
-                setOpen(false);
-              }}
-            >
-              Retire Device
-            </Button>
+            {canEdit && (
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  if (selectedDevice) retireDeviceHandler(selectedDevice);
+                  setOpen(false);
+                }}
+              >
+                Retire Device
+              </Button>
+            )}
 
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (selectedDevice) deleteDeviceHandler(selectedDevice);
-                setOpen(false);
-              }}
-            >
-              Delete Permanently
-            </Button>
+            {canDelete && (
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (selectedDevice) deleteDeviceHandler(selectedDevice);
+                  setOpen(false);
+                }}
+              >
+                Delete Permanently
+              </Button>
+            )}
           </div>
 
           <AlertDialogFooter>

@@ -10,7 +10,7 @@ const CateoryPage = async () => {
     const categories = await getDeviceCategory()
 
     return (
-        <Card>
+        <Card className="mt-2">
             <CardHeader >
                 <div className='flex justify-between items-center'>
                     <h1>Device Category</h1>

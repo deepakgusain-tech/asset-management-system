@@ -9,7 +9,7 @@ import { Employee } from '@/types'
 const EmployeePage = async () => {
     const employees = await getEmployee()
     return (
-        <Card>
+        <Card className="mt-2">
             <CardHeader>
                 <div className='flex justify-between items-center'>
                     <h1>Employee</h1>

@@ -2,7 +2,6 @@
 
 import { moduleSchema } from "@/lib/validators";
 import { Module } from "@/types";
-import { Role } from "@/lib/generated/prisma/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { ControllerRenderProps, SubmitHandler, useForm } from "react-hook-form";
@@ -35,24 +34,27 @@ import { createModule, updateModule } from "@/lib/actions/module-action";
 const ModuleForm = ({
   data,
   update = false,
-  roles,
 }: {
   data?: Module;
   update: boolean;
-  roles: Role[];
 }) => {
   const router = useRouter();
-  const id = data?.id;
+  const id = (data as any)?.id;
 
   const form = useForm<z.infer<typeof moduleSchema>>({
     resolver: zodResolver(moduleSchema),
-    defaultValues: data || roleDefaultValues,
+    defaultValues: data || {
+      name: "",
+      description: "",
+      route: "",
+      status: Status.ACTIVE,
+    },
   });
 
   const [isPending, startTransition] = React.useTransition();
 
   const onSubmit: SubmitHandler<z.infer<typeof moduleSchema>> = async (
-    values: any
+    values: any,
   ) => {
     startTransition(async () => {
       let res;
@@ -103,45 +105,6 @@ const ModuleForm = ({
             />
           </div>
 
-          {/*  Role   */}
-
-          <div className="flex flex-col">
-            <FormField
-              control={form.control}
-              name="roleId"
-              render={({
-                field,
-              }: {
-                field: ControllerRenderProps<
-                  z.infer<typeof moduleSchema>,
-                  "roleId"
-                >;
-              }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <FormControl>
-                    <Select   value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-
-                      <SelectContent>
-                        {roles.map(
-                          (role) =>
-                            role.id && (
-                              <SelectItem key={role.id} value={role.id}>
-                                {role.name}
-                              </SelectItem>
-                            )
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
           {/*  Status   */}
           <div className="flex flex-col gap-5">
             <FormField
@@ -159,7 +122,7 @@ const ModuleForm = ({
                   <FormLabel>Status</FormLabel>
                   <FormControl>
                     <Select
-                      defaultValue={field.value}
+                      value={field.value}
                       onValueChange={(v) => field.onChange(v as Status)}
                     >
                       <SelectTrigger className="w-full">

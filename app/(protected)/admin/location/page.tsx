@@ -10,7 +10,7 @@ const LocationPage = async () => {
     const locations = await getLocation()
 
     return (
-        <Card>
+        <Card className="mt-2">
             <CardHeader>
                 <div className='flex justify-between items-center'>
                     <h1>Location</h1>

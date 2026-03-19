@@ -17,6 +17,7 @@ export default function DeviceRepairForm({
   const [vendor, setVendor] = useState("");
   const [cost, setCost] = useState("");
   const [notes, setNotes] = useState("");
+  const [repairDate, setRepairDate] = useState("");
   const router = useRouter();
 
   const submit = async () => {
@@ -25,14 +26,15 @@ export default function DeviceRepairForm({
       vendor,
       cost: Number(cost),
       notes,
+      repairDate,
     });
 
     if (!res.success) {
       toast.error(res.message);
     } else {
       toast.success(res.message);
-      router.refresh();   // refresh page data
-      onClose();          // close form
+      router.refresh(); // refresh page data
+      onClose(); // close form
     }
   };
 
@@ -44,6 +46,12 @@ export default function DeviceRepairForm({
         placeholder="Repair Vendor"
         value={vendor}
         onChange={(e) => setVendor(e.target.value)}
+      />
+
+      <Input
+        type="date"
+        value={repairDate}
+        onChange={(e) => setRepairDate(e.target.value)}
       />
 
       <Input

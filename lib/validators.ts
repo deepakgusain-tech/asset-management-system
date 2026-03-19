@@ -27,15 +27,11 @@ export const roleSchema = z.object({
   updatedAt: z.date().nullable().optional(),
 });
 
-// module schema
 export const moduleSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().min(1, "Role name is required"),
-  description: z.string().min(1, "Role description is required"),
-  roleId: z.string(),
-  status: z.enum(Object.values(Status)),
-  createdAt: z.date().nullable().optional(),
-  updatedAt: z.date().nullable().optional(),
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  route: z.string().optional(), // ✅ comma added
+  status: z.nativeEnum(Status),
 });
 
 // deviceCategory schema

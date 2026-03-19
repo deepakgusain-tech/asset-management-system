@@ -8,6 +8,7 @@ export async function sendDeviceToRepair(data: {
   vendor: string;
   cost: number;
   notes?: string;
+  repairDate?: string;
 }) {
   try {
 
@@ -18,7 +19,8 @@ export async function sendDeviceToRepair(data: {
           deviceId: data.deviceId,
           vendor: data.vendor,
           cost: data.cost,
-          notes: data.notes
+          notes: data.notes,
+          repairDate: data.repairDate ? new Date(data.repairDate) : new Date(),
         }
       })
 

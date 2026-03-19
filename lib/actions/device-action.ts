@@ -4,6 +4,10 @@ import { Device } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { deviceCateorySchema, deviceSchema } from "../validators";
 import { formatError } from "../utils";
+import { createNotification } from "@/lib/actions/notification-action";
+import { checkWarrantyExpiry } from "@/lib/cron/warranty-check";
+import { auth } from "@/auth";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 // get device categories
 
@@ -19,6 +23,18 @@ export async function getDevice(): Promise<Device[]> {
 
 // create device
 export async function createDevice(data: Device) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  if (!canAccess(user, "/admin/device", "create")) {
+    throw new Error("No permission");
+  }
+
   try {
     const deviceData = deviceSchema.parse(data);
 
@@ -50,6 +66,18 @@ export async function createDevice(data: Device) {
       return createdDevice;
     });
 
+    // ✅ AFTER transaction (correct place)
+
+    await createNotification({
+      title: "New Device Added",
+      message: `${device.name} has been added`,
+      type: "DEVICE_CREATE",
+      deviceId: device.id,
+    });
+
+    // ✅ Warranty trigger
+    await checkWarrantyExpiry();
+
     return {
       success: true,
       message: "Device created successfully",
@@ -65,7 +93,7 @@ export async function createDevice(data: Device) {
 // get device  by id
 
 export async function getDeviceById(
-  id: string
+  id: string,
 ): Promise<{ success: boolean; data?: Device; message: string }> {
   try {
     const device = await prisma.device.findUnique({
@@ -98,6 +126,18 @@ export async function getDeviceById(
 
 // update  device
 export async function updateDevice(data: Device, id: string) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  if (!canAccess(user, "/admin/device", "edit")) {
+    throw new Error("No permission");
+  }
+
   try {
     const device = deviceCateorySchema.parse(data);
 
@@ -136,29 +176,37 @@ export async function updateDevice(data: Device, id: string) {
 
 // delete  device
 export async function deleteDevice(id: string) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  if (!canAccess(user, "/admin/device", "delete")) {
+    throw new Error("No permission");
+  }
+
   try {
-
     await prisma.$transaction(async (tx) => {
-
       await tx.deviceHistory.deleteMany({
-        where: { deviceId: id }
+        where: { deviceId: id },
       });
 
       await tx.deviceAssigned.deleteMany({
-        where: { deviceId: id }
+        where: { deviceId: id },
       });
 
       await tx.device.delete({
-        where: { id }
+        where: { id },
       });
-
     });
 
     return {
       success: true,
       message: "Device deleted permanently",
     };
-
   } catch (error) {
     return {
       success: false,
@@ -168,36 +216,44 @@ export async function deleteDevice(id: string) {
 }
 
 export async function retireDevice(id: string) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  if (!canAccess(user, "/admin/device", "delete")) {
+    throw new Error("No permission");
+  }
+
   try {
-
     await prisma.$transaction(async (tx) => {
-
       await tx.device.update({
         where: { id },
         data: {
-          deviceState: "RETIRED"
-        }
+          deviceState: "RETIRED",
+        },
       });
 
       await tx.deviceHistory.create({
         data: {
           deviceId: id,
           actionType: "RETIRED",
-          notes: "Device retired from system"
-        }
+          notes: "Device retired from system",
+        },
       });
-
     });
 
     return {
       success: true,
-      message: "Device retired successfully"
+      message: "Device retired successfully",
     };
-
   } catch (error) {
     return {
       success: false,
-      message: formatError(error)
+      message: formatError(error),
     };
   }
 }

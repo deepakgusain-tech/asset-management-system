@@ -8,7 +8,7 @@ const ModulePage = async () => {
     const modules = await getModules();
 
     return (
-        <Card>
+        <Card className="mt-2">
             <CardHeader>
                 <div className='flex justify-between items-center'>
                     <h1>Module</h1>
