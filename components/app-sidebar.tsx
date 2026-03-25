@@ -44,6 +44,11 @@ const data = {
   ],
   navMain: [
     {
+      title: "Dashboard",
+      url: "/admin/dashboard",
+      icon: PieChart,
+    },
+    {
       title: "Device",
       url: "/admin/device",
       icon: Laptop2Icon,
@@ -63,6 +68,13 @@ const data = {
           url: "/admin/device-assigned",
           icon: UserPlus,
         },
+      ],
+    },
+    {
+      title: "Procurement",
+      url: "/admin/procurement",
+      icon: BriefcaseBusinessIcon,
+      items: [
         {
           title: "Vendor",
           url: "/admin/vendor",

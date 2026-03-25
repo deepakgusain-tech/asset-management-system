@@ -8,27 +8,25 @@ import { createNotification } from "@/lib/actions/notification-action";
 import { User } from "@/types";
 import { z } from "zod";
 
-// ✅ Response type
 type ActionResponse = {
   success: boolean;
   message: string;
 };
 
-// ✅ Mapper (CRITICAL)
 function mapUser(u: any): User {
   return {
     id: u.id,
-    name: u.name ?? "",            // ✅ FIX
-    email: u.email ?? "",          // ✅ FIX
+    name: u.name ?? "",            
+    email: u.email ?? "",          
     image: u.image ?? null,
     status: u.status,
+    password: u.password,
     roleId: u.roleId,
     createdAt: u.createdAt.toISOString(),
     updatedAt: u.updatedAt?.toISOString(),
   };
 }
 
-// ✅ GET USERS
 export async function getUsers(): Promise<User[]> {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },
@@ -37,7 +35,6 @@ export async function getUsers(): Promise<User[]> {
   return users.map(mapUser);
 }
 
-// ✅ CREATE USER
 export async function createUser(
   data: z.infer<typeof userSchema>
 ): Promise<ActionResponse> {
@@ -80,7 +77,6 @@ export async function createUser(
   }
 }
 
-// ✅ GET USER BY ID
 export async function getUserById(id: string) {
   try {
     const user = await prisma.user.findUnique({
@@ -96,7 +92,7 @@ export async function getUserById(id: string) {
 
     return {
       success: true,
-      data: mapUser(user), // 🔥 FIX
+      data: mapUser(user), 
       message: "User fetched successfully",
     };
   } catch (error) {
@@ -107,7 +103,6 @@ export async function getUserById(id: string) {
   }
 }
 
-// ✅ UPDATE USER
 export async function updateUser(
   data: z.infer<typeof userSchema>,
   id: string
@@ -149,7 +144,6 @@ export async function updateUser(
   }
 }
 
-// ✅ DELETE USER
 export async function deleteUser(id: string): Promise<ActionResponse> {
   try {
     await prisma.user.delete({

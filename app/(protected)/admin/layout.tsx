@@ -46,7 +46,7 @@ export default async function RootLayout({
   const config = await getConfiguration();
 
   const allowedRoutes =
-    dbUser?.role?.name === "Admin"
+  dbUser?.role?.roleModules?.map((rm) => rm.module.route) || []
       ? [
           "/admin/device",
           "/admin/device-category",
@@ -63,6 +63,7 @@ export default async function RootLayout({
           "/admin/module",
           "/admin/configuration",
           "/admin/notifications",
+          "/admin/dashboard",
         ]
       : dbUser?.role?.roleModules?.reduce((acc, rm) => {
           if (rm?.module?.route) {

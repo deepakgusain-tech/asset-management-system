@@ -1,3 +1,4 @@
+import { description } from "@/components/chart-area-interactive";
 import { prisma } from "@/lib/db/prisma-helper";
 
 export async function POST(req: Request) {
@@ -7,6 +8,7 @@ export async function POST(req: Request) {
   const role = await prisma.role.create({
     data: {
       name,
+      description: description || "",
       roleModules: {
         create: modules.map((moduleId: string) => ({
           moduleId,
