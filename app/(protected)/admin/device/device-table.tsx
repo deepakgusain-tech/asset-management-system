@@ -73,7 +73,6 @@ const DeviceTable = ({
       });
 
       const response = await getDevice();
-      console.log(response);
 
       setDevice(response as Device[]);
     }

@@ -28,7 +28,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           where: { email: credentials.email as string },
         });
 
-        // console.log("User found:", user);
 
         // check if user exist and if the password matches
         if (user && user.password) {
@@ -37,7 +36,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             user.password,
           );
 
-          //   console.log("Password match:", isMatched);
 
           // if password  is correct , return user
           if (isMatched) {

@@ -98,7 +98,6 @@ export default function DeviceHistoryClient({
 
   return (
     <div className="mt-2 p-2 space-y-2 h-[calc(100vh-120px)] flex flex-col">
-      {/* DEVICE HEADER */}
       <div className="flex gap-10 bg-muted/40 p-3 rounded-md text-sm">
         <div>
           <span className="text-muted-foreground">Device</span>
@@ -161,7 +160,6 @@ export default function DeviceHistoryClient({
       <div
         className={`grid ${showRepair || showReturn ? "grid-cols-2" : "grid-cols-1"} gap-6`}
       >
-        {/* LEFT SIDE FORM */}
         {showRepair && (
           <DeviceRepairForm
             deviceId={deviceId}
@@ -176,7 +174,6 @@ export default function DeviceHistoryClient({
           />
         )}
 
-        {/* RIGHT SIDE HISTORY */}
 
         <div>
           {!showCrux && (
@@ -185,13 +182,11 @@ export default function DeviceHistoryClient({
 
               {history.map((item: any) => (
                 <div key={item.id} className="flex gap-4">
-                  {/* timeline dot */}
                   <div className="flex flex-col items-center">
                     <div className="w-3 h-3 bg-primary rounded-full mt-2"></div>
                     <div className="w-px bg-border flex-1"></div>
                   </div>
 
-                  {/* history card */}
                   <div className="border rounded-md p-4 w-full bg-background">
                     <div className="flex justify-between">
                       <span

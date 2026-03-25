@@ -22,19 +22,16 @@ const DeviceAssignedPage = async () => {
 
   const user = await getUserPermissions(session.user.email);
 
-  const route = "/device-assigned"; // ✅ centralized route
+  const route = "/admin/device-assigned";
 
-  // ✅ VIEW CHECK
   if (!canAccess(user, route, "view")) {
     redirect("/404");
   }
 
-  // ✅ Permission flags
   const canCreate = canAccess(user, route, "create");
   const canEdit = canAccess(user, route, "edit");
   const canDelete = canAccess(user, route, "delete");
 
-  // ✅ Data fetching
   const [deviceAssigned, devices, employees] = await Promise.all([
     getAssignedDevices(),
     getDevice(),
@@ -47,10 +44,9 @@ const DeviceAssignedPage = async () => {
         <div className="flex justify-between items-center">
           <h1>Device Assigned</h1>
 
-          {/* ✅ RBAC applied */}
           {canCreate && (
             <Button className="bg-blue-500 hover:bg-blue-600">
-              <Link href="/device-assigned/create">
+              <Link href="/admin/device-assigned/create">
                 Add Device Assigned
               </Link>
             </Button>
@@ -63,8 +59,8 @@ const DeviceAssignedPage = async () => {
           data={deviceAssigned}
           devices={devices as Device[]}
           employees={employees as Employee[]}
-          canEdit={canEdit}     // 🔥 pass permissions down
-          canDelete={canDelete} // 🔥 pass permissions down
+          canEdit={canEdit}
+          canDelete={canDelete} 
         />
       </CardContent>
     </Card>

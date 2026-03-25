@@ -1,4 +1,5 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -16,23 +17,29 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function RequirementTable({ requirement }: { requirement: Requirement[] }) {
-  const [Requirement, setRequirements] = useState<Requirement[]>(requirement); 
+type Props = {
+  requirement: Requirement[];
+  canEdit: boolean;
+  canDelete: boolean;
+};
 
-  const deleteRequirementHandler = async (id: any) => {
-    let res = await deleteRequirement(id);
+export default function RequirementTable({
+  requirement,
+  canEdit,
+  canDelete,
+}: Props) {
+  const [requirements, setRequirements] = useState<Requirement[]>(requirement);
+
+  const deleteRequirementHandler = async (id: string) => {
+    const res = await deleteRequirement(id);
 
     if (!res?.success) {
-      toast.error("Error", {
-        description: res?.message,
-      });
+      toast.error("Error", { description: res?.message });
     } else {
-      toast.success("Success", {
-        description: res?.message,
-      });
+      toast.success("Success", { description: res?.message });
 
-      const response = await getRequirement();
-      setRequirements(response as Requirement[]);
+      const updated = await getRequirement();
+      setRequirements(updated as Requirement[]);
     }
   };
 
@@ -41,44 +48,64 @@ export default function RequirementTable({ requirement }: { requirement: Require
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Requirement ID</TableHead>
+            <TableHead>ID</TableHead>
             <TableHead>Model</TableHead>
             <TableHead>Warranty</TableHead>
-            <TableHead>Created At</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Created At</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
-          {Requirement.map((Requirement) => (
-            <TableRow key={Requirement.id}>
-              <TableCell>{Requirement.id}</TableCell>
-              <TableCell>{Requirement.model}</TableCell>
-              <TableCell>{Requirement.warranty}</TableCell>
-              <TableCell>{Requirement.createdAt && format(Requirement.createdAt, "PPP")}</TableCell>
-              <TableCell>{Requirement.status}</TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    asChild
-                    size="icon"
-                    className="bg-orange-500 hover:bg-orange-600"
-                  >
-                    <Link href={`/admin/requirements/edit/${Requirement.id}`}>
-                      <EditIcon size={16} />
-                    </Link>
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="destructive"
-                    onClick={() => deleteRequirementHandler(Requirement.id)}
-                  >
-                    <Trash size={16} />
-                  </Button>
-                </div>
+          {requirements.length > 0 ? (
+            requirements.map((req) => (
+              <TableRow key={req.id}>
+                <TableCell>{req.id}</TableCell>
+                <TableCell>{req.model}</TableCell>
+                <TableCell>{req.warranty}</TableCell>
+                <TableCell>{req.status}</TableCell>
+
+                <TableCell>
+                  {req.createdAt ? format(req.createdAt, "PPP") : "-"}
+                </TableCell>
+
+                <TableCell>
+                  <div className="flex gap-2">
+                    {canEdit && (
+                      <Button
+                        asChild
+                        size="icon"
+                        className="bg-orange-500 hover:bg-orange-600"
+                      >
+                        <Link href={`/admin/requirements/edit/${req.id}`}>
+                          <EditIcon size={16} />
+                        </Link>
+                      </Button>
+                    )}
+
+                    {canDelete && (
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        onClick={() =>
+                          req.id && deleteRequirementHandler(req.id)
+                        }
+                      >
+                        <Trash size={16} />
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center py-4">
+                No requirements found
               </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
     </div>

@@ -2,27 +2,19 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
   BriefcaseBusinessIcon,
   BuildingIcon,
-  Command,
   ComputerIcon,
   FileText,
   Frame,
   GalleryVerticalEnd,
   Laptop2Icon,
-  LocateIcon,
   LocationEdit,
   Map,
   PersonStanding,
   PersonStandingIcon,
   PieChart,
-  Settings2,
-  Settings2Icon,
   SettingsIcon,
-  SquareTerminal,
   User,
   User2,
   UserCog,
@@ -31,7 +23,6 @@ import {
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -41,7 +32,7 @@ import {
 } from "@/components/ui/sidebar";
 import { APP_NAME } from "@/lib/constants";
 import { IconTableSpark } from "@tabler/icons-react";
-
+import { Configuration } from "@/lib/generated/prisma/client";
 // This is sample data.
 const data = {
   teams: [
@@ -170,6 +161,7 @@ type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
     image?: string;
     allowedRoutes?: string[];
   };
+  config?: Configuration | null;
 };
 
 function filterNav(navMain: any[], allowedRoutes: string[]) {
@@ -193,16 +185,34 @@ function filterNav(navMain: any[], allowedRoutes: string[]) {
     .filter(Boolean);
 }
 
-export function AppSidebar({ user, ...props }: AppSidebarProps) {
-  console.log("SIDEBAR USER:", user);           // 👈 ADD THIS
-  console.log("ALLOWED ROUTES:", user?.allowedRoutes);
+export function AppSidebar({ user, config, ...props }: AppSidebarProps) {
   const allowedRoutes = user?.allowedRoutes || [];
   const filteredNav = filterNav(data.navMain, allowedRoutes);
 
   return (
     <Sidebar collapsible="icon" user={user} {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <SidebarHeader>
+          <div className="flex items-center px-3 py-2 group-data-[collapsible=icon]:justify-center">
+            {/* Logo */}
+            <div className="flex items-center justify-center h-8 w-8 shrink-0">
+              {config?.logo ? (
+                <img
+                  src={config.logo}
+                  alt="logo"
+                  className="h-8 w-8 rounded object-cover"
+                />
+              ) : (
+                <GalleryVerticalEnd className="h-6 w-6" />
+              )}
+            </div>
+
+            {/* Text */}
+            <span className="ml-2 font-semibold text-sm truncate group-data-[collapsible=icon]:hidden">
+              {config?.name || APP_NAME}
+            </span>
+          </div>
+        </SidebarHeader>
       </SidebarHeader>
 
       <SidebarContent>
@@ -223,4 +233,3 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
     </Sidebar>
   );
 }
-

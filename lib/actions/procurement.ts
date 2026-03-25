@@ -1,26 +1,42 @@
 "use server";
 
-import { Procurement, Requirement } from "@/types";
+import { Procurement } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { formatError } from "../utils";
-import { requriementsSchema } from "../validators";
+import { auth } from "@/auth";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
 import { sendMail } from "../mail";
 import { requirementEmailTemplate } from "../requirement-template";
 
-// get requirement
-export async function getProcurement() {
-  return await prisma.procurement.findMany({
-    orderBy: {
-      createdAt: 'desc'
-    },
-  })
+async function checkPermission(action: "view" | "create" | "edit" | "delete") {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  const route = "/admin/procurement";
+
+  if (!canAccess(user, route, action)) {
+    throw new Error("Access Denied");
+  }
 }
 
-// create requirement
+export async function getProcurement(): Promise<Procurement[]> {
+  await checkPermission("view");
+
+  return (await prisma.procurement.findMany({
+    orderBy: { createdAt: "desc" },
+  })) as Procurement[];
+}
+
 export async function createProcurement(data: Procurement) {
   try {
+    await checkPermission("create");
 
-    await prisma.procurement.create({
+    const created = await prisma.procurement.create({
       data: {
         manufatured: data.manufatured,
         model: data.model,
@@ -31,15 +47,24 @@ export async function createProcurement(data: Procurement) {
         quotationValidity: data.quotationValidity,
         status: data.status,
         notes: data.notes,
-        requirementId: data.requirementId
+        requirementId: data.requirementId,
       },
     });
 
-    let html = requirementEmailTemplate(data as any)
+    const html = requirementEmailTemplate({
+      requirementId: created.id,
+      vendorId: data.vendorId,
+      vendorName: "Vendor", // or fetch from DB if needed
+      model: data.model,
+      manufatured: "",
+      warranty: "",
+      quotationValidity: "",
+      configuration: [],
+    });
 
     await sendMail({
-      to: "deepak@mail.com",
-      subject : "subject",
+      to: "example@mail.com",
+      subject: "Procurement Request",
       html,
     });
 
@@ -55,18 +80,18 @@ export async function createProcurement(data: Procurement) {
   }
 }
 
-// get requirement by id
 export async function getProcurementById(id: string) {
   try {
-    let requirement = await prisma.requirement.findFirst({
+    await checkPermission("view");
+
+    const procurement = await prisma.procurement.findFirst({
       where: { id },
     });
 
-    if (requirement) {
+    if (procurement) {
       return {
         success: true,
-        data: requirement,
-        message: "Procurement created successfully",
+        data: procurement,
       };
     }
 
@@ -82,14 +107,24 @@ export async function getProcurementById(id: string) {
   }
 }
 
-// update requirement
-export async function updateProcurement(data: Requirement, id: string) {
+export async function updateProcurement(data: Procurement, id: string) {
   try {
-    const requirement = requriementsSchema.parse(data);
+    await checkPermission("edit");
 
-    await prisma.requirement.update({
+    await prisma.procurement.update({
       where: { id },
-      data: requirement as any,
+      data: {
+        manufatured: data.manufatured,
+        model: data.model,
+        vendorId: data.vendorId,
+        configuration: JSON.stringify(data.configuration),
+        warranty: data.warranty,
+        warrantyType: data.warrantyType,
+        quotationValidity: data.quotationValidity,
+        status: data.status,
+        notes: data.notes,
+        requirementId: data.requirementId,
+      },
     });
 
     return {
@@ -104,10 +139,11 @@ export async function updateProcurement(data: Requirement, id: string) {
   }
 }
 
-// delete requirement
-export async function deleteProcurement(id: any) {
+export async function deleteProcurement(id: string) {
   try {
-    await prisma.requirement.delete({
+    await checkPermission("delete");
+
+    await prisma.procurement.delete({
       where: { id },
     });
 

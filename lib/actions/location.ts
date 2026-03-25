@@ -5,127 +5,124 @@ import { prisma } from "../db/prisma-helper";
 import { locationSchema } from "../validators";
 import { formatError } from "../utils";
 
-// get device categories
+/* ---------------- GET ALL ---------------- */
+
 export async function getLocation() {
-    return await prisma.location.findMany({
-        orderBy: {
-            createdAt: 'desc'
-        },
-    })
+  return prisma.location.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 }
 
-// create location
+/* ---------------- CREATE ---------------- */
+
 export async function createLocation(data: Location) {
+  try {
+    const location = locationSchema.parse(data);
 
-    try {
-        const location = locationSchema.parse(data)
+    await prisma.location.create({
+      data: {
+        name: location.name,
+        streetAddress: location.streetAddress,
+        city: location.city,
+        state: location.state,
+        postalCode: location.postalCode,
+        country: location.country,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        status: location.status,
+      },
+    });
 
-        await prisma.location.create({
-            data: {
-                name: location.name,
-                streetAddress: location.streetAddress,
-                city: location.city,
-                state: location.state,
-                postalCode: location.postalCode,
-                country: location.country,
-                latitude: location.latitude,
-                longitude: location.longitude,
-                status: location.status,
-            }
-        })
-
-        return {
-            success: true,
-            message: "Department created successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return {
+      success: true,
+      message: "Location created successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-// get Location by id
+/* ---------------- GET BY ID ---------------- */
+
 export async function getLocationById(id: string) {
-    try {
+  try {
+    const location = await prisma.location.findUnique({
+      where: { id },
+    });
 
-        let location = await prisma.location.findFirst({
-            where: { id }
-        })
-
-        if (location) {
-            return {
-                success: true,
-                data: location,
-                message: "Location get successfully"
-            }
-        }
-
-        return {
-            success: false,
-            message: "Location not found"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
+    if (!location) {
+      return {
+        success: false,
+        message: "Location not found",
+      };
     }
+
+    return {
+      success: true,
+      data: location,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-// update location
+/* ---------------- UPDATE ---------------- */
+
 export async function updateLocation(data: Location, id: string) {
-    try {
+  try {
+    const location = locationSchema.parse(data);
 
-        const location = locationSchema.parse(data)
+    await prisma.location.update({
+      where: { id },
+      data: {
+        name: location.name,
+        streetAddress: location.streetAddress,
+        city: location.city,
+        state: location.state,
+        postalCode: location.postalCode,
+        country: location.country,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        status: location.status,
+      },
+    });
 
-        await prisma.location.update({
-            where: { id },
-            data: {
-                name: location.name,
-                streetAddress: location.streetAddress,
-                city: location.city,
-                state: location.state,
-                postalCode: location.postalCode,
-                country: location.country,
-                latitude: location.latitude,
-                longitude: location.longitude,
-                status: location.status,
-            }
-        })
-
-        return {
-            success: true,
-            message: "Location updated successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return {
+      success: true,
+      message: "Location updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-// delete Location
-export async function deleteLocation(id: any) {
-    try {
-        await prisma.location.delete({
-            where: { id }
-        })
+/* ---------------- DELETE ---------------- */
 
-        return {
-            success: true,
-            message: "Location deleted successfully"
-        }
+export async function deleteLocation(id: string) {
+  try {
+    await prisma.location.delete({
+      where: { id },
+    });
 
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return {
+      success: true,
+      message: "Location deleted successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }

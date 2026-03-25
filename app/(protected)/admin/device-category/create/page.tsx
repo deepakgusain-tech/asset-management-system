@@ -3,23 +3,43 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import Link from 'next/link'
 import React from 'react'
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
 
-const DeviceCategoryCreate = () => {
-    return (
-        <Card>
-            <CardHeader>
-                <div className='flex justify-between items-center'>
-                    <h1>Add Device Category</h1>
-                    <Button variant="default" className='bg-blue-500 hover:bg-blue-600'>
-                        <Link href="/admin/device-category">Back</Link>
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <DeviceCategoryForm update={false} />
-            </CardContent>
-        </Card>
-    )
+const DeviceCategoryCreate = async () => {
+
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    redirect("/sign-in");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  const route = "/admin/device-category";
+
+  if (!canAccess(user, route, "create")) {
+    redirect("/404");
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className='flex justify-between items-center'>
+          <h1>Add Device Category</h1>
+
+          <Button className='bg-blue-500 hover:bg-blue-600'>
+            <Link href="/admin/device-category">Back</Link>
+          </Button>
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <DeviceCategoryForm update={false} />
+      </CardContent>
+    </Card>
+  )
 }
 
-export default DeviceCategoryCreate
+export default DeviceCategoryCreate;

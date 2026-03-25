@@ -17,14 +17,38 @@ import { Trash2 } from "lucide-react";
 
 type StatusFilter = "ALL" | "PENDING" | "APPROVED" | "REJECTED";
 
-export default function ProcurementTable() {
-  const [quotes, setQuotes] = useState<any[]>([]);
+type Quote = {
+  id: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  vendor?: { name: string };
+  requirement?: { model: string };
+  grandTotal: number;
+  deliveryDays: number;
+  validTill: string;
+};
+
+type Props = {
+  canApprove: boolean;
+  canReject: boolean;
+  canDelete: boolean;
+};
+
+export default function ProcurementTable({
+  canApprove,
+  canReject,
+  canDelete,
+}: Props) {
+  const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>("ALL");
 
   const loadData = async () => {
-    const data = await getQuotations();
-    setQuotes(data);
+    try {
+      const data = await getQuotations();
+setQuotes(data as unknown as Quote[]);
+    } catch {
+      toast.error("Failed to load quotations");
+    }
   };
 
   useEffect(() => {
@@ -105,9 +129,7 @@ export default function ProcurementTable() {
   };
 
   const filteredQuotes =
-    filter === "ALL"
-      ? quotes
-      : quotes.filter((q) => q.status === filter);
+    filter === "ALL" ? quotes : quotes.filter((q) => q.status === filter);
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -117,7 +139,7 @@ export default function ProcurementTable() {
 
   return (
     <div className="w-full p-6 space-y-6">
- 
+
       <div className="flex gap-2">
         {["ALL", "PENDING", "APPROVED", "REJECTED"].map((status) => (
           <Button
@@ -155,22 +177,15 @@ export default function ProcurementTable() {
 
           {filteredQuotes.map((quote) => {
             const isPending = quote.status === "PENDING";
-            const isApproved = quote.status === "APPROVED";
 
             return (
               <TableRow key={quote.id}>
-                <TableCell className="font-medium">
-                  {quote.vendor?.name}
-                </TableCell>
-
-                <TableCell>{quote.requirement?.model}</TableCell>
-
+                <TableCell>{quote.vendor?.name || "-"}</TableCell>
+                <TableCell>{quote.requirement?.model || "-"}</TableCell>
                 <TableCell className="font-semibold">
                   {formatCurrency(quote.grandTotal)}
                 </TableCell>
-
                 <TableCell>{quote.deliveryDays} Days</TableCell>
-
                 <TableCell>
                   {format(new Date(quote.validTill), "PPP")}
                 </TableCell>
@@ -189,53 +204,41 @@ export default function ProcurementTable() {
                   </span>
                 </TableCell>
 
-                
                 <TableCell>
-                  <div className="flex items-center justify-end gap-3">
+                  <div className="flex justify-end gap-3">
 
-                  
-                    <Button
-                      size="sm"
-                      onClick={() => handleApprove(quote.id)}
-                      disabled={!isPending || loadingId === quote.id}
-                      className={`min-w-[110px] bg-green-500 hover:bg-green-600 transition-opacity ${
-                        !isPending ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      {loadingId === quote.id ? "Processing..." : "Approve"}
-                    </Button>
+                    {canApprove && (
+                      <Button
+                        size="sm"
+                        onClick={() => handleApprove(quote.id)}
+                        disabled={!isPending || loadingId === quote.id}
+                        className="bg-green-500 hover:bg-green-600"
+                      >
+                        {loadingId === quote.id ? "..." : "Approve"}
+                      </Button>
+                    )}
 
-                
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleReject(quote.id)}
-                      disabled={!isPending || loadingId === quote.id}
-                      className={`min-w-[110px] transition-opacity ${
-                        !isPending ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      Reject
-                    </Button>
+                    {canReject && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleReject(quote.id)}
+                        disabled={!isPending || loadingId === quote.id}
+                      >
+                        Reject
+                      </Button>
+                    )}
 
-                   
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => handleDelete(quote.id)}
-                      disabled={isApproved || loadingId === quote.id}
-                      className={`border-red-500 text-red-600 hover:bg-red-50 transition-opacity ${
-                        isApproved
-                          ? "opacity-50 cursor-not-allowed"
-                          : ""
-                      }`}
-                    >
-                      {loadingId === quote.id ? (
-                        <span className="animate-spin">⏳</span>
-                      ) : (
-                        <Trash2 size={16} />
-                      )}
-                    </Button>
+                    {canDelete && (
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => handleDelete(quote.id)}
+                        disabled={loadingId === quote.id}
+                      >
+                        {loadingId === quote.id ? "⏳" : <Trash2 size={16} />}
+                      </Button>
+                    )}
 
                   </div>
                 </TableCell>

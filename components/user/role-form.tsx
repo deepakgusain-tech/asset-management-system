@@ -44,7 +44,13 @@ const RoleForm = ({
 
   const form = useForm<z.infer<typeof roleSchema>>({
     resolver: zodResolver(roleSchema),
-    defaultValues: data || roleDefaultValues,
+    defaultValues: data
+      ? {
+          name: data.name,
+          description: data.description,
+          status: data.status,
+        }
+      : roleDefaultValues,
   });
 
   const [isPending, startTransition] = React.useTransition();

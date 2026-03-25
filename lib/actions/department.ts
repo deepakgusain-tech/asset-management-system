@@ -1,119 +1,72 @@
 "use server";
 
-import { Department } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { departmentSchema } from "../validators";
 import { formatError } from "../utils";
 
-// get device categories
+/* GET */
 export async function getDepartment() {
-    return await prisma.department.findMany({
-        orderBy: {
-            createdAt: 'desc'
-        },
-    })
+  return prisma.department.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 }
 
-// create Department
-export async function createDepartment(data: Department) {
+/* CREATE */
+export async function createDepartment(data: any) {
+  try {
+    const dept = departmentSchema.parse(data);
 
-    try {
-        const department = departmentSchema.parse(data)
+    await prisma.department.create({
+      data: {
+        name: dept.name,
+        description: dept.description,
+        status: dept.status,
+      },
+    });
 
-        await prisma.department.create({
-            data: {
-                name: department.name,
-                description: department.description,
-                status: department.status
-            }
-        })
-
-        return {
-            success: true,
-            message: "Department created successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return { success: true, message: "Created" };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
 }
 
-// get Department by id
+/* GET BY ID */
 export async function getDepartmentById(id: string) {
-    try {
+  const data = await prisma.department.findUnique({ where: { id } });
 
-        let department = await prisma.department.findFirst({
-            where: { id }
-        })
+  if (!data) return { success: false };
 
-        if (department) {
-            return {
-                success: true,
-                data: department,
-                message: "Department created successfully"
-            }
-        }
-
-        return {
-            success: false,
-            message: "Department not found"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+  return { success: true, data };
 }
 
-// update department
-export async function updateDepartment(data: Department, id: string) {
-    try {
+/* UPDATE */
+/* UPDATE */
+export async function updateDepartment(data: any, id: string) {
+  try {
+    const dept = departmentSchema.parse(data);
 
-        const department = departmentSchema.parse(data)
+    await prisma.department.update({
+      where: { id },
+      data: {
+        name: dept.name,
+        description: dept.description,
+        status: dept.status,
+      },
+    });
 
-        await prisma.department.update({
-            where: { id },
-            data: {
-                name: department.name,
-                description: department.description,
-                status: department.status
-            }
-        })
-
-        return {
-            success: true,
-            message: "Department updated successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
 }
 
-// delete department
-export async function deleteDepartment(id: any) {
-    try {
-        await prisma.department.delete({
-            where: { id }
-        })
+/* DELETE */
+export async function deleteDepartment(id: string) {
+  try {
+    await prisma.department.delete({ where: { id } });
 
-        return {
-            success: true,
-            message: "Department deleted successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
 }

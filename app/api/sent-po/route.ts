@@ -26,7 +26,6 @@ export async function POST(req: Request) {
       message: "Purchase Order sent successfully",
     });
   } catch (error) {
-    console.error(error);
     return NextResponse.json(
       { message: "Error sending mail" },
       { status: 500 }

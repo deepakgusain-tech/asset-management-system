@@ -15,7 +15,6 @@ const DeviceEditPage = async ({
 }: {
   params: Promise<{ id: string }>;
 }) => {
-  // ✅ MUST be inside component
   const session = await auth();
 
   if (!session?.user?.email) {
@@ -24,15 +23,12 @@ const DeviceEditPage = async ({
 
   const user = await getUserPermissions(session.user.email);
 
-  // ✅ EDIT PERMISSION CHECK
   if (!canAccess(user, "/admin/device", "edit")) {
     redirect("/404");
   }
 
-  // ✅ get params
   const { id } = await params;
 
-  // ✅ fetch data
   const res = await getDeviceById(id);
 
   if (!res?.success || !res.data) {

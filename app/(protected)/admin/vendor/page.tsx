@@ -4,22 +4,51 @@ import Link from "next/link";
 import VendorTable from "./vendor-table";
 import { getVendors } from "@/lib/actions/vendor";
 import { Vendor } from "@/types";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const VendorPage = async () => {
-  const vendor = await getVendors();
+  const session = await auth();
+  if (!session?.user?.email) {
+    redirect("/sign-in");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+  const route = "/admin/vendor";
+
+  if (!canAccess(user, route, "view")) {
+    redirect("/404");
+  }
+
+  const canCreate = canAccess(user, route, "create");
+  const canEdit = canAccess(user, route, "edit");
+  const canDelete = canAccess(user, route, "delete");
+
+  const vendors = await getVendors();
+
   return (
-    <Card>
+    <Card className="mt-2">
       <CardHeader>
         <div className="flex justify-between items-center">
           <h1 className="text-lg font-semibold">Vendor</h1>
-          <Button variant="default" className="bg-blue-500 hover:bg-blue-600">
-            <Link href="/admin/vendor/create">Add Vendor</Link>
-          </Button>
+
+          {canCreate && (
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              <Link href="/admin/vendor/create">
+                Add Vendor
+              </Link>
+            </Button>
+          )}
         </div>
       </CardHeader>
 
-      <CardContent className="w-full">
-          <VendorTable vendor={vendor as Vendor[]} />
+      <CardContent>
+        <VendorTable
+          vendor={vendors as Vendor[]}
+          canEdit={canEdit}
+          canDelete={canDelete}
+        />
       </CardContent>
     </Card>
   );

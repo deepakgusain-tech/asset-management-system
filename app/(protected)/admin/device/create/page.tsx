@@ -9,7 +9,6 @@ import { redirect } from "next/navigation";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const DeviceCreate = async () => {
-  // ✅ MUST be inside component
   const session = await auth();
 
   if (!session?.user?.email) {
@@ -18,7 +17,6 @@ const DeviceCreate = async () => {
 
   const user = await getUserPermissions(session.user.email);
 
-  // ✅ CREATE PERMISSION CHECK
   if (!canAccess(user, "/admin/device", "create")) {
     redirect("/404");
   }

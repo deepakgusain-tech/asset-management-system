@@ -5,11 +5,30 @@ import { getRequirementById } from '@/lib/actions/requirements';
 import Link from 'next/link';
 import { Vendor } from '@/types';
 import { getVendors } from '@/lib/actions/vendor';
+import { auth } from '@/auth';
+import { getUserPermissions, canAccess } from '@/lib/rbac';
+import { redirect } from 'next/navigation';
 
 const RequirementEditPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
-  const requirement = await getRequirementById(id)  
+
+  const session = await auth();
+  if (!session?.user?.email) {
+    redirect("/sign-in");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  if (!canAccess(user, "/admin/requirements", "edit")) {
+    redirect("/404");
+  }
+
+  const requirement = await getRequirementById(id);
   const vendors = await getVendors();
+
+  if (!requirement?.data) {
+    redirect("/404");
+  }
 
 
   return (

@@ -24,9 +24,8 @@ const DeviceAssignedEditPage = async ({ params }: { params: { id: string } }) =>
 
   const user = await getUserPermissions(session.user.email);
 
-  const route = "/device-assigned";
+  const route = "/admin/device-assigned";
 
-  // ✅ EDIT permission check
   if (!canAccess(user, route, "edit")) {
     redirect("/404");
   }

@@ -18,7 +18,6 @@ const DevicePage = async () => {
 
   const user = await getUserPermissions(session.user.email);
 
-  // ✅ VIEW CHECK (centralized)
   if (!canAccess(user, "/admin/device", "view")) {
     redirect("/404");
   }

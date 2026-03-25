@@ -52,15 +52,17 @@ const ConfigurationForm = ({ data }: { data?: Configuration }) => {
       const formData = new FormData();
       formData.append("image", file);
 
-      const fileUploadRes = await fetch("/api/upload", {
+      const res = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       });
 
-      const data = await fileUploadRes.json();
+      const data = await res.json();
+
 
       return data;
     } catch (error: any) {
+
       return {
         success: false,
         message: error.message,
@@ -68,37 +70,45 @@ const ConfigurationForm = ({ data }: { data?: Configuration }) => {
     }
   };
 
-  function onSubmit(values: Configuration) {
+  async function onSubmit(values: Configuration) {
     startTransition(async () => {
-      let res;
+      try {
+        if (values.logo instanceof File) {
+          const res = await uploadImage(values.logo);
 
-      let imageRes = await uploadImage(values.logo as File);
+          if (!res?.success) {
+            throw new Error("Logo upload failed");
+          }
 
-      if (imageRes?.success) values.logo = imageRes.url;
+          values.logo = res.url; 
+        }
 
-      imageRes =
-        (values.logo as File) && (await uploadImage(values.favicon as File));
+        if (values.favicon instanceof File) {
+          const res = await uploadImage(values.favicon);
 
-      if (imageRes?.success) values.favicon = imageRes.url;
+          if (!res?.success) {
+            throw new Error("Favicon upload failed");
+          }
 
-      res = await createOrUpdateConfiguration(values, data?.id as string);
-      
-      if (!res?.success) {
-        toast.error("Error", {
-          description: res?.message,
-        });
-      } else {
-        toast.success("Success", {
-          description: res?.message,
-        });
+          values.favicon = res.url; 
+        }
 
-        router.refresh();
+        const result = await createOrUpdateConfiguration(values);
+
+        if (!result?.success) {
+          toast.error(result.message);
+        } else {
+          toast.success(result.message);
+          router.refresh();
+        }
+      } catch (err: any) {
+        toast.error(err.message);
       }
     });
   }
 
   return (
-    <Card>
+    <Card className="mt-2 shadow-sm">
       <CardHeader>
         <div className="flex justify-between items-center">
           <h1 className="text-lg font-semibold">Configuration</h1>

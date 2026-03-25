@@ -17,7 +17,6 @@ export default async function DeviceHistoryPage({
       ? sp.assignedId
       : undefined;
 
-  console.log("assignedId from URL:", assignedId);
 
   const history = await prisma.deviceHistory.findMany({
     where: {
@@ -73,7 +72,6 @@ export default async function DeviceHistoryPage({
         employee: true,
       },
     });
-    console.log("assigned record:", assigned);
   }
 
   return (

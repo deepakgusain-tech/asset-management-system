@@ -1,27 +1,26 @@
 "use server";
 
 import { Requirement } from "@/types";
-import { prisma } from "../db/prisma-helper";
 import { formatError } from "../utils";
 import { requriementsSchema } from "../validators";
-import { sendMail } from "../mail";
 import { requirementEmailTemplate } from "../requirement-template";
 import { getVendorById } from "./vendor";
+import { prisma } from "@/lib/db/prisma-helper";
+import { sendMail } from "@/lib/mail";
 
 // get requirement
 export async function getRequirement() {
   return await prisma.requirement.findMany({
     orderBy: {
-      createdAt: 'desc'
+      createdAt: "desc",
     },
-  })
+  });
 }
 
 // create requirement
 export async function createRequirement(data: Requirement) {
   try {
-
-    const response =  await prisma.requirement.create({
+    const response = await prisma.requirement.create({
       data: {
         manufatured: data.manufatured,
         model: data.model,
@@ -35,27 +34,39 @@ export async function createRequirement(data: Requirement) {
       },
     });
 
-    console.log(response);
-    
+    // ✅ fetch vendors in one query
+    const vendors = await prisma.vendor.findMany({
+      where: {
+        id: {
+          in: data.vendorIds,
+        },
+      },
+    });
 
-    
-    for (const vendorId of data.vendorIds) {
-      const vendor = await getVendorById(vendorId)
-      
-      let html = requirementEmailTemplate({...data, vendorName : vendor.data?.name as string, vendorId:vendor.data?.id as string, requirementId:response.id as string})
+    // ✅ send emails (non-blocking)
+    for (const vendor of vendors) {
+      if (!vendor.email) continue;
+      const html = requirementEmailTemplate({
+        ...data,
+        vendorName: vendor.name,
+        vendorId: vendor.id,
+        requirementId: response.id,
+      });
 
-      await sendMail({
-        to: vendor.data?.email as string,
+      sendMail({
+        to: vendor.email,
         subject: "Asset Request – Quotation Required",
         html,
-      });
+      })
+        .then((info) => {
+        })
+        .catch((err) => {
+        });
     }
-
-
 
     return {
       success: true,
-      message: "Requirment created successfully",
+      message: "Requirement created successfully",
     };
   } catch (error) {
     return {
@@ -88,9 +99,6 @@ export async function getRequirementById(id: string) {
     return {
       success: false,
       message: formatError(error),
-
-
-
     };
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Trash2, Eye, Pencil } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,26 +27,11 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { createPurchaseOrder } from "@/lib/actions/purchase-order";
+import { getRequirement } from "@/lib/actions/requirements";
+import { getVendors } from "@/lib/actions/vendor";
+import { getDeviceCategory } from "@/lib/actions/device-category-action";
+import { useRouter } from "next/navigation";
 
-/* ---------------- TEMP DATA ---------------- */
-
-const requirements = [
-  { id: "req-1", name: "Laptops" },
-  { id: "req-2", name: "Office Chairs" }
-];
-
-const vendors = [
-  { id: "ven-1", name: "ABC Traders" },
-  { id: "ven-2", name: "XYZ Suppliers" }
-];
-
-const deviceCategories = [
-  { id: "cat-1", name: "Laptop" },
-  { id: "cat-2", name: "Keyboard" },
-  { id: "cat-3", name: "Mouse" }
-];
-
-/* ---------------- TYPES ---------------- */
 
 type POItem = {
   deviceCategoryId: string;
@@ -54,9 +39,13 @@ type POItem = {
   unitPrice: number;
 };
 
-/* ---------------- COMPONENT ---------------- */
-
 export default function CreatePurchaseOrderPage() {
+  const router = useRouter();
+
+  const [requirements, setRequirements] = useState<any[]>([]);
+  const [vendors, setVendors] = useState<any[]>([]);
+  const [deviceCategories, setDeviceCategories] = useState<any[]>([]);
+
   const [requirementId, setRequirementId] = useState("");
   const [vendorId, setVendorId] = useState("");
 
@@ -65,6 +54,23 @@ export default function CreatePurchaseOrderPage() {
   ]);
 
   const [readOnly, setReadOnly] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+
+  useEffect(() => {
+    const load = async () => {
+      const req = await getRequirement();
+      const ven = await getVendors();
+      const cat = await getDeviceCategory();
+
+      setRequirements(req);
+      setVendors(ven);
+      setDeviceCategories(cat);
+    };
+
+    load();
+  }, []);
+
 
   const addItem = () => {
     if (readOnly) return;
@@ -98,21 +104,30 @@ export default function CreatePurchaseOrderPage() {
       return;
     }
 
-    await createPurchaseOrder({
-      requirementId,
-      vendorId,
-      items: items.map(item => ({
-        deviceCategoryId: item.deviceCategoryId,
-        quantity: Number(item.quantity),
-        unitPrice: Number(item.unitPrice)
-      }))
-    });
+    try {
+      setLoading(true);
 
-    alert("Purchase Order Created");
+      await createPurchaseOrder({
+        requirementId,
+        vendorId,
+        items,
+      });
+
+      alert("Purchase Order Created");
+
+      router.push("/admin/purchase-order"); 
+    } catch (error) {
+      alert("Failed to create PO");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  /* ---------------- UI ---------------- */
 
   return (
     <div className="space-y-8">
+
       {/* HEADER */}
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Create Purchase Order</h1>
@@ -125,12 +140,13 @@ export default function CreatePurchaseOrderPage() {
         </Button>
       </div>
 
-      {/* PO DETAILS */}
+      {/* DETAILS */}
       <Card>
         <CardHeader>
           <CardTitle>Purchase Order Details</CardTitle>
         </CardHeader>
         <CardContent className="grid grid-cols-3 gap-6">
+
           <Input disabled placeholder="PO Number (auto-generated)" />
 
           <Select disabled={readOnly} onValueChange={setRequirementId}>
@@ -138,9 +154,9 @@ export default function CreatePurchaseOrderPage() {
               <SelectValue placeholder="Select Requirement *" />
             </SelectTrigger>
             <SelectContent>
-              {requirements.map(req => (
+              {requirements.map((req) => (
                 <SelectItem key={req.id} value={req.id}>
-                  {req.name}
+                  {req.model || req.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -151,13 +167,14 @@ export default function CreatePurchaseOrderPage() {
               <SelectValue placeholder="Select Vendor *" />
             </SelectTrigger>
             <SelectContent>
-              {vendors.map(v => (
+              {vendors.map((v) => (
                 <SelectItem key={v.id} value={v.id}>
                   {v.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+
         </CardContent>
       </Card>
 
@@ -168,25 +185,14 @@ export default function CreatePurchaseOrderPage() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* HEADER ROW */}
-          <div className="grid grid-cols-5  text-sm font-medium text-muted-foreground">
-            <div className="ml-10">Item</div>
-            <div className="text-center">Qty</div>
-            <div className="text-center">Unit Price</div>
-            <div className="text-right">Total</div>
-            <div className="text-center">Action</div>
-          </div>
 
-          {/* DATA ROWS */}
           {items.map((item, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-5 gap-4 items-center"
-            >
+            <div key={index} className="grid grid-cols-5 gap-4 items-center">
+
               <Select
                 disabled={readOnly}
                 value={item.deviceCategoryId}
-                onValueChange={value =>
+                onValueChange={(value) =>
                   updateItem(index, "deviceCategoryId", value)
                 }
               >
@@ -194,7 +200,7 @@ export default function CreatePurchaseOrderPage() {
                   <SelectValue placeholder="Select Item" />
                 </SelectTrigger>
                 <SelectContent>
-                  {deviceCategories.map(cat => (
+                  {deviceCategories.map((cat) => (
                     <SelectItem key={cat.id} value={cat.id}>
                       {cat.name}
                     </SelectItem>
@@ -203,60 +209,33 @@ export default function CreatePurchaseOrderPage() {
               </Select>
 
               <Input
-                disabled={readOnly}
                 type="number"
-                min={1}
-                className="text-center"
                 value={item.quantity}
-                onChange={e =>
+                disabled={readOnly}
+                onChange={(e) =>
                   updateItem(index, "quantity", Number(e.target.value))
                 }
               />
 
               <Input
-                disabled={readOnly}
                 type="number"
-                min={0}
-                className="text-right"
                 value={item.unitPrice}
-                onChange={e =>
+                disabled={readOnly}
+                onChange={(e) =>
                   updateItem(index, "unitPrice", Number(e.target.value))
                 }
               />
 
-              <div className="text-right font-semibold">
-                ₹{item.quantity * item.unitPrice}
-              </div>
+              <div>₹{item.quantity * item.unitPrice}</div>
 
-              <div className="flex justify-center">
-                {!readOnly && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 size={16} />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Remove this item?
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => removeItem(index)}
-                        >
-                          Remove
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </div>
+              {!readOnly && (
+                <Button
+                  variant="destructive"
+                  onClick={() => removeItem(index)}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              )}
             </div>
           ))}
 
@@ -265,21 +244,22 @@ export default function CreatePurchaseOrderPage() {
               + Add Item
             </Button>
           )}
+
         </CardContent>
       </Card>
 
-      {/* SUMMARY */}
-      <Card className="bg-muted/40">
-        <CardContent className="flex justify-between items-center py-6">
-          <span className="text-lg font-medium">Total Payable</span>
-          <span className="text-2xl font-bold">₹{totalAmount}</span>
+      {/* TOTAL */}
+      <Card>
+        <CardContent className="flex justify-between py-6">
+          <span>Total</span>
+          <span className="font-bold">₹{totalAmount}</span>
         </CardContent>
       </Card>
 
       {!readOnly && (
         <div className="flex justify-end">
-          <Button size="lg" onClick={handleCreatePO}>
-            Create Purchase Order
+          <Button onClick={handleCreatePO} disabled={loading}>
+            {loading ? "Creating..." : "Create Purchase Order"}
           </Button>
         </div>
       )}

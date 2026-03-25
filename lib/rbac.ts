@@ -18,19 +18,15 @@ export async function getUserPermissions(email: string) {
   });
 }
 
-// ✅ check permission
-export function canAccess(
-  user: any,
-  route: string,
-  action: "view" | "create" | "edit" | "delete"
-) {
+export function canAccess(user: any, route: string, action: string) {
+
   if (!user) return false;
 
-  // ✅ Admin bypass
-  if (user.role.name === "Admin") return true;
+  // ✅ FIXED ADMIN CHECK (FINAL)
+  if (user.role?.name?.toLowerCase().includes("admin")) return true;
 
   const permission = user.role.roleModules.find(
-    (rm: any) => rm.module.route === route
+    (rm: any) => rm.module.route === route,
   );
 
   if (!permission) return false;

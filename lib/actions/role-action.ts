@@ -1,16 +1,36 @@
 "use server";
 
-import { Role } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { roleSchema } from "../validators";
 import { formatError } from "../utils";
+import { Role } from "@/types";
 
-export async function getRoles() {
-  return await prisma.role.findMany();
+
+type ActionResponse = {
+  success: boolean;
+  message: string;
+};
+
+function mapRole(r: any): Role {
+  return {
+    id: r.id,
+    name: r.name,
+    description: r.description,
+    status: r.status,
+    createdAt: r.createdAt.toISOString(),
+    updatedAt: r.updatedAt?.toISOString(),
+  };
 }
 
-// create role
-export async function createRole(data: any) {
+export async function getRoles(): Promise<Role[]> {
+  const roles = await prisma.role.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
+  return roles.map(mapRole);
+}
+
+export async function createRole(data: any): Promise<ActionResponse> {
   try {
     const role = roleSchema.parse(data);
 
@@ -43,26 +63,29 @@ export async function createRole(data: any) {
   }
 }
 
-// get module by id
 export async function getRoleById(id: string) {
   try {
-    let role = await prisma.role.findFirst({
+    const role = await prisma.role.findUnique({
       where: { id },
       include: {
         roleModules: true,
       },
     });
-    if (role) {
+
+    if (!role) {
       return {
-        success: true,
-        data: role,
-        message: "Role get successfully",
+        success: false,
+        message: "Role not found",
       };
     }
 
     return {
-      success: false,
-      message: "Role not found",
+      success: true,
+      data: {
+        ...mapRole(role),
+        roleModules: role.roleModules,
+      },
+      message: "Role fetched successfully",
     };
   } catch (error) {
     return {
@@ -72,17 +95,19 @@ export async function getRoleById(id: string) {
   }
 }
 
-// update role
-export async function updateRole(data: any, id: string) {
+export async function updateRole(
+  data: any,
+  id: string,
+): Promise<ActionResponse> {
   try {
     const role = roleSchema.parse(data);
 
-    // delete old modules
+    // delete old permissions
     await prisma.roleModule.deleteMany({
       where: { roleId: id },
     });
 
-    // update role + modules
+    // recreate with permissions (FIXED)
     await prisma.role.update({
       where: { id },
       data: {
@@ -90,8 +115,12 @@ export async function updateRole(data: any, id: string) {
         description: role.description,
         status: role.status,
         roleModules: {
-          create: data.modules.map((moduleId: string) => ({
-            moduleId,
+          create: data.modules.map((m: any) => ({
+            moduleId: m.moduleId,
+            canView: m.canView,
+            canCreate: m.canCreate,
+            canEdit: m.canEdit,
+            canDelete: m.canDelete,
           })),
         },
       },
@@ -109,8 +138,7 @@ export async function updateRole(data: any, id: string) {
   }
 }
 
-// delete role
-export async function deleteRole(id: any) {
+export async function deleteRole(id: string): Promise<ActionResponse> {
   try {
     await prisma.role.delete({
       where: { id },

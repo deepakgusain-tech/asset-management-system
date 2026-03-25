@@ -17,7 +17,7 @@ async function checkPermission(action: "view" | "create" | "edit" | "delete") {
 
   const user = await getUserPermissions(session.user.email);
 
-  const route = "/device-assigned";
+  const route = "/admin/device-assigned";
 
   if (!canAccess(user, route, action)) {
     throw new Error("Access Denied");
@@ -121,22 +121,23 @@ export async function createAssignedDevice(data: DeviceAssigned) {
 // get device category by id
 export async function getDeviceAssignedById(id: string) {
   try {
-    await checkPermission("view");
-    let deviceCategory = await prisma.deviceAssigned.findFirst({
+    await checkPermission("edit"); // ✅ already fixed
+
+    const deviceAssigned = await prisma.deviceAssigned.findUnique({
       where: { id },
     });
 
-    if (deviceCategory) {
+    if (!deviceAssigned) {
       return {
-        success: true,
-        data: deviceCategory,
-        message: "Device Assigned get successfully",
+        success: false,
+        message: "Device Assigned not found",
       };
     }
 
     return {
-      success: false,
-      message: "Device Assinged not found",
+      success: true,
+      data: deviceAssigned,
+      message: "Device Assigned fetched successfully",
     };
   } catch (error) {
     return {

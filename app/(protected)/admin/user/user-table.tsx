@@ -10,31 +10,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { deleteUser, getUsers } from "@/lib/actions/user-action";
+import { deleteUser } from "@/lib/actions/user-action";
 import { User } from "@/types";
 import { EditIcon, Trash } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
-const UserTable = ({ data }: { data: User[] }) => {
+type Props = {
+  data: User[];
+  canEdit: boolean;
+  canDelete: boolean;
+};
+
+const UserTable = ({ data, canEdit, canDelete }: Props) => {
   const [users, setUsers] = useState<User[]>(data);
 
-  const deleteUserHandler = async (id: any) => {
-    let res = await deleteUser(id);
+  const deleteUserHandler = async (id: string) => {
+    const res = await deleteUser(id);
 
     if (!res?.success) {
-      toast.error("Error", {
-        description: res?.message,
-      });
-    } else {
-      toast.success("Success", {
-        description: res?.message,
-      });
-
-      const response = await getUsers();
-      setUsers(response as User[]);
+      toast.error("Error", { description: res?.message });
+      return;
     }
+
+    toast.success("Success", { description: res?.message });
+
+    setUsers((prev) => prev.filter((u) => u.id !== id));
   };
 
   return (
@@ -45,14 +48,22 @@ const UserTable = ({ data }: { data: User[] }) => {
           <TableHead>Name</TableHead>
           <TableHead>Email</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead>CreatedAt</TableHead>
+          <TableHead>Created</TableHead>
           <TableHead>Action</TableHead>
         </TableRow>
       </TableHeader>
+
       <TableBody>
+        {users.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={6} className="text-center py-6">
+              No users found
+            </TableCell>
+          </TableRow>
+        )}
+
         {users.map((user) => (
           <TableRow key={user.id}>
-            {/* Image column — intentionally blank */}
             <TableCell>
               {user.image ? (
                 <img
@@ -78,11 +89,12 @@ const UserTable = ({ data }: { data: User[] }) => {
             </TableCell>
 
             <TableCell>
-              {user.createdAt ? new Date(user.createdAt).toLocaleString() : "-"}
+              {user.createdAt &&
+                format(new Date(user.createdAt), "PPP")}
             </TableCell>
 
-            <TableCell>
-              <div className="flex gap-2">
+            <TableCell className="flex gap-2">
+              {canEdit && (
                 <Button
                   asChild
                   size="icon"
@@ -92,15 +104,23 @@ const UserTable = ({ data }: { data: User[] }) => {
                     <EditIcon size={16} />
                   </Link>
                 </Button>
+              )}
 
-                <Button
-                  size="icon"
-                  variant="destructive"
-                  onClick={() => deleteUserHandler(user.id)}
-                >
-                  <Trash size={16} />
-                </Button>
-              </div>
+              {canDelete &&
+                (() => {
+                  const id = user.id;
+                  if (!id) return null;
+
+                  return (
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      onClick={() => deleteUserHandler(id)}
+                    >
+                      <Trash size={16} />
+                    </Button>
+                  );
+                })()}
             </TableCell>
           </TableRow>
         ))}

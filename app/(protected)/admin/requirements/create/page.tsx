@@ -5,8 +5,22 @@ import { getVendors } from "@/lib/actions/vendor";
 import Link from "next/link";
 import React from "react";
 import { Vendor } from "@/types";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const RequirementCreatePage = async () => {
+
+   const session = await auth();
+  if (!session?.user?.email) {
+    redirect("/sign-in");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  if (!canAccess(user, "/admin/requirements", "create")) {
+    redirect("/404");
+  }
 
   const vendors = await getVendors();
   return (

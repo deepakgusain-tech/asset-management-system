@@ -11,13 +11,15 @@ export async function getConfiguration() {
 }
 
 // create configuration
-export async function createOrUpdateConfiguration(data: Configuration, id: string) {
+export async function createOrUpdateConfiguration(data: Configuration) {
   try {
     const configuration = configurationSchema.parse(data);
 
-    if (id) {
+    const existing = await prisma.configuration.findFirst();
+
+    if (existing) {
       await prisma.configuration.update({
-        where: { id },
+        where: { id: existing.id },
         data: configuration as any,
       });
     } else {
@@ -28,7 +30,7 @@ export async function createOrUpdateConfiguration(data: Configuration, id: strin
 
     return {
       success: true,
-      message: "Configuration updated successfully",
+      message: "Configuration saved successfully",
     };
   } catch (error) {
     return {

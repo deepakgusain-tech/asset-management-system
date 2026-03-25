@@ -1,7 +1,7 @@
 "use client";
 
 import { moduleSchema } from "@/lib/validators";
-import { Module } from "@/types";
+import { Module, Role } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { ControllerRenderProps, SubmitHandler, useForm } from "react-hook-form";
@@ -27,28 +27,34 @@ import { Button } from "../ui/button";
 import { ArrowRight, Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Status } from "@/lib/generated/prisma/enums";
-import { roleDefaultValues } from "@/lib/constants";
 import { Textarea } from "../ui/textarea";
 import { createModule, updateModule } from "@/lib/actions/module-action";
 
-const ModuleForm = ({
-  data,
-  update = false,
-}: {
+type Props = {
   data?: Module;
   update: boolean;
-}) => {
+  roles: Role[]; 
+};
+
+const ModuleForm = ({ data, update = false, roles }: Props) => {
   const router = useRouter();
-  const id = (data as any)?.id;
+  const id = data?.id;
 
   const form = useForm<z.infer<typeof moduleSchema>>({
     resolver: zodResolver(moduleSchema),
-    defaultValues: data || {
-      name: "",
-      description: "",
-      route: "",
-      status: Status.ACTIVE,
-    },
+    defaultValues: data
+      ? {
+          name: data.name,
+          description: data.description,
+          route: data.route || "",
+          status: data.status,
+        }
+      : {
+          name: "",
+          description: "",
+          route: "",
+          status: Status.ACTIVE,
+        },
   });
 
   const [isPending, startTransition] = React.useTransition();

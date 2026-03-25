@@ -6,7 +6,6 @@ import { NextResponse } from "next/server"
 export async function GET() {
 
   if (shouldRunWarrantyCheck()) {
-    console.log("Running warranty check (hybrid)...")
     await checkWarrantyExpiry()
   }
 

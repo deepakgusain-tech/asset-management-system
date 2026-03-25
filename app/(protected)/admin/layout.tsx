@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { prisma } from "@/lib/db/prisma-helper";
+import { getConfiguration } from "@/lib/actions/configuration";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -24,10 +25,9 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
-  console.log("SESSION:", session);
   const dbUser = session?.user?.email
     ? await prisma.user.findUnique({
-        where: { email: session.user.email }, // ✅ CHANGED HERE
+        where: { email: session.user.email },
         include: {
           role: {
             include: {
@@ -42,7 +42,8 @@ export default async function RootLayout({
       })
     : null;
 
-  // const allowedRoutes = dbUser?.role?.roleModules?.map((rm) => rm.module.route) || [];
+  
+  const config = await getConfiguration();
 
   const allowedRoutes =
     dbUser?.role?.name === "Admin"
@@ -61,8 +62,14 @@ export default async function RootLayout({
           "/admin/role",
           "/admin/module",
           "/admin/configuration",
+          "/admin/notifications",
         ]
-      : dbUser?.role?.roleModules?.map((rm) => rm.module.route) || [];
+      : dbUser?.role?.roleModules?.reduce((acc, rm) => {
+          if (rm?.module?.route) {
+            acc.push(rm.module.route);
+          }
+          return acc;
+        }, [] as string[]) || [];
 
   const user = dbUser
     ? {
@@ -76,7 +83,7 @@ export default async function RootLayout({
   return (
     <>
       <SidebarProvider>
-        <AppSidebar user={user} />
+        <AppSidebar user={user} config={config} />
         <SidebarInset>
           <header className="relative sticky top-0 z-50 flex h-16 items-center justify-between bg-background border-b px-4">
             <div className="flex items-center gap-2">

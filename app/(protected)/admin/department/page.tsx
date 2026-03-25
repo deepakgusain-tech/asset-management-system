@@ -1,27 +1,59 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import Link from 'next/link'
-import React from 'react'
-import DepartmentTable from './department-table'
-import { getDepartment } from '@/lib/actions/department'
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import Link from "next/link";
+import DepartmentTable from "./department-table";
+import { getDepartment } from "@/lib/actions/department";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const DepartmentPage = async () => {
-    const department = await getDepartment()
-    return (
-        <Card>
-            <CardHeader>
-                <div className='flex justify-between items-center'>
-                    <h1>Department</h1>
-                    <Button variant="default" className='bg-blue-500 hover:bg-blue-600'>
-                        <Link href="department/create">Add Department</Link>
-                    </Button>
-                </div>
-            </CardHeader>
-            <CardContent className='w-full'>
-                <DepartmentTable data={department} />
-            </CardContent>
-        </Card>
-    )
-}
+  const session = await auth();
+  if (!session?.user?.email) {
+    redirect("/sign-in");
+  }
 
-export default DepartmentPage
+  const user = await getUserPermissions(session.user.email);
+  const route = "/admin/department";
+
+  if (!canAccess(user, route, "view")) {
+    redirect("/404");
+  }
+
+  const roleName = user?.role?.name || "";
+  const isAdmin = roleName.toLowerCase().includes("admin");
+
+  const canCreate = isAdmin || canAccess(user, route, "create");
+  const canEdit = isAdmin || canAccess(user, route, "edit");
+  const canDelete = isAdmin || canAccess(user, route, "delete");
+
+  const department = await getDepartment();
+
+  return (
+    <Card className="mt-2 shadow-sm">
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <h1>Department</h1>
+
+          {canCreate && (
+            <Button className="bg-blue-500 hover:bg-blue-600">
+              <Link href="/admin/department/create">
+                Add Department
+              </Link>
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+
+      <CardContent>
+        <DepartmentTable
+          data={department}
+          canEdit={canEdit}
+          canDelete={canDelete}
+        />
+      </CardContent>
+    </Card>
+  );
+};
+
+export default DepartmentPage;

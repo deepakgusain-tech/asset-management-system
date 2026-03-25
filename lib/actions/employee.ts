@@ -5,129 +5,126 @@ import { prisma } from "../db/prisma-helper";
 import { employeeSchema } from "../validators";
 import { formatError } from "../utils";
 
-// get device categories
+/* ---------------- GET ALL ---------------- */
+
 export async function getEmployee() {
-    return await prisma.employee.findMany({
-        orderBy: {
-            createdAt: 'desc'
-        },
-    })
+  return prisma.employee.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 }
 
-// create employee
+/* ---------------- CREATE ---------------- */
+
 export async function createEmployee(data: Employee) {
+  try {
+    const employee = employeeSchema.parse(data);
 
-    try {
-        const employee = employeeSchema.parse(data)
+    await prisma.employee.create({
+      data: {
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        email: employee.email,
+        phoneNumber: employee.phoneNumber,
+        dateOfBirth: employee.dateOfBirth,
+        hireDate: employee.hireDate,
+        salary: employee.salary,
+        departmentId: employee.departmentId,
+        locationId: employee.locationId,
+        status: employee.status,
+      },
+    });
 
-        await prisma.employee.create({
-            data: {
-                first_name: employee.first_name,
-                last_name: employee.last_name,
-                email: employee.email,
-                phoneNumber: employee.phoneNumber,
-                dateOfBirth: employee.dateOfBirth,
-                hireDate: employee.hireDate,
-                salary: employee.salary,
-                departmentId: employee.departmentId,
-                locationId: employee.locationId,
-                status: employee.status,
-            }
-        })
-
-        return {
-            success: true,
-            message: "Employee created successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return {
+      success: true,
+      message: "Employee created successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-// get employee by id
+/* ---------------- GET BY ID ---------------- */
+
 export async function getEmployeeById(id: string) {
-    try {
+  try {
+    const employee = await prisma.employee.findUnique({
+      where: { id },
+    });
 
-        let employee = await prisma.employee.findFirst({
-            where: { id }
-        })
-
-        if (employee) {
-            return {
-                success: true,
-                data: employee,
-                message: "Employee get successfully"
-            }
-        }
-
-        return {
-            success: false,
-            message: "Location not found"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
+    if (!employee) {
+      return {
+        success: false,
+        message: "Employee not found",
+      };
     }
+
+    return {
+      success: true,
+      data: employee,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-// update employee
+/* ---------------- UPDATE ---------------- */
+
 export async function updateEmployee(data: Employee, id: string) {
-    try {
+  try {
+    const employee = employeeSchema.parse(data);
 
-        const employee = employeeSchema.parse(data)
+    await prisma.employee.update({
+      where: { id },
+      data: {
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        email: employee.email,
+        phoneNumber: employee.phoneNumber,
+        dateOfBirth: employee.dateOfBirth,
+        hireDate: employee.hireDate,
+        salary: employee.salary,
+        departmentId: employee.departmentId,
+        locationId: employee.locationId,
+        status: employee.status,
+      },
+    });
 
-        await prisma.employee.update({
-            where: { id },
-            data: {
-                 first_name: employee.first_name,
-                last_name: employee.last_name,
-                email: employee.email,
-                phoneNumber: employee.phoneNumber,
-                dateOfBirth: employee.dateOfBirth,
-                hireDate: employee.hireDate,
-                salary: employee.salary,
-                departmentId: employee.departmentId,
-                locationId: employee.locationId,
-                status: employee.status,
-            }
-        })
-
-        return {
-            success: true,
-            message: "Employee updated successfully"
-        }
-
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return {
+      success: true,
+      message: "Employee updated successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }
 
-// delete employee
-export async function deleteEmployee(id: any) {
-    try {
-        await prisma.employee.delete({
-            where: { id }
-        })
+/* ---------------- DELETE ---------------- */
 
-        return {
-            success: true,
-            message: "Employee deleted successfully"
-        }
+export async function deleteEmployee(id: string) {
+  try {
+    await prisma.employee.delete({
+      where: { id },
+    });
 
-    } catch (error) {
-        return {
-            success: false,
-            message: formatError(error)
-        }
-    }
+    return {
+      success: true,
+      message: "Employee deleted successfully",
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: formatError(error),
+    };
+  }
 }

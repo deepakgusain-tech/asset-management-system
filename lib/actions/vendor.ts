@@ -4,9 +4,34 @@ import { Vendor } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { formatError } from "../utils";
 import { vendorSchema } from "../validators";
+import { auth } from "@/auth";
+import { getUserPermissions, canAccess } from "@/lib/rbac";
 
-// get device categories
+// ✅ COMMON RBAC CHECK
+async function checkPermission(
+  action: "view" | "create" | "edit" | "delete"
+) {
+  const session = await auth();
+
+  if (!session?.user?.email) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getUserPermissions(session.user.email);
+
+  const route = "/admin/vendor"; // 🔥 must match DB
+
+  if (!canAccess(user, route, action)) {
+    throw new Error("Access Denied");
+  }
+
+  return user;
+}
+
+// ✅ GET
 export async function getVendors() {
+  await checkPermission("view");
+
   return await prisma.vendor.findMany({
     orderBy: {
       createdAt: "desc",
@@ -14,9 +39,11 @@ export async function getVendors() {
   });
 }
 
-// create vendor
+// ✅ CREATE
 export async function createVendor(data: Vendor) {
   try {
+    await checkPermission("create");
+
     const vendor = vendorSchema.parse(data);
 
     await prisma.vendor.create({
@@ -35,10 +62,12 @@ export async function createVendor(data: Vendor) {
   }
 }
 
-// get Department by id
+// ✅ GET BY ID
 export async function getVendorById(id: string) {
   try {
-    let vendor = await prisma.vendor.findFirst({
+    await checkPermission("view");
+
+    const vendor = await prisma.vendor.findFirst({
       where: { id },
     });
 
@@ -46,13 +75,13 @@ export async function getVendorById(id: string) {
       return {
         success: true,
         data: vendor,
-        message: "vendor created successfully",
+        message: "Vendor fetched successfully",
       };
     }
 
     return {
       success: false,
-      message: "vendor not found",
+      message: "Vendor not found",
     };
   } catch (error) {
     return {
@@ -62,9 +91,11 @@ export async function getVendorById(id: string) {
   }
 }
 
-// update vendor
+// ✅ UPDATE
 export async function updateVendor(data: Vendor, id: string) {
   try {
+    await checkPermission("edit");
+
     const vendor = vendorSchema.parse(data);
 
     await prisma.vendor.update({
@@ -84,9 +115,11 @@ export async function updateVendor(data: Vendor, id: string) {
   }
 }
 
-// delete vendor
-export async function deleteVendor(id: any) {
+// ✅ DELETE
+export async function deleteVendor(id: string) {
   try {
+    await checkPermission("delete");
+
     await prisma.vendor.delete({
       where: { id },
     });

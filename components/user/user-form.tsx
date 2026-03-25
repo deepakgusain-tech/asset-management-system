@@ -30,7 +30,7 @@ import { Status } from "@/lib/generated/prisma/enums";
 import { userDefaultValues } from "@/lib/constants";
 import { Textarea } from "../ui/textarea";
 import { createUser, updateUser } from "@/lib/actions/user-action";
-import { Role } from "@/lib/generated/prisma/client";
+import { Role } from "@/types";
 
 type UserFormProps = {
   data?: User;

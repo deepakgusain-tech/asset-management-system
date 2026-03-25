@@ -11,7 +11,6 @@ export async function sendMail({
   subject: string;
   html: string;
 }) {
-
   const config = await prisma.configuration.findFirst();
 
   if (!config) {
@@ -26,7 +25,7 @@ export async function sendMail({
       user: config.smtpUser,
       pass: config.smtpPassword,
     },
-  } as any);
+  });
 
   return transport.sendMail({
     from: `Asset Management <${config.fromEmail}>`,

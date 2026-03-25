@@ -73,7 +73,6 @@ export default function NotificationListClient({ notifications }: any) {
             hover:bg-blue-500/20 hover:border-blue-500/60
           `}
         >
-          {/* HEADER */}
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               {!n.isRead && (
@@ -87,10 +86,8 @@ export default function NotificationListClient({ notifications }: any) {
             </span>
           </div>
 
-          {/* MESSAGE */}
           <p className="text-sm text-muted-foreground mt-1">{n.message}</p>
 
-          {/* TYPE */}
           <span className="text-xs mt-2 inline-block px-2 py-1 rounded bg-primary/20">
             {n.type}
           </span>

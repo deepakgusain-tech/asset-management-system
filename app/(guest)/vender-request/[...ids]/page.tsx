@@ -13,7 +13,6 @@ const VendorRequestPage = async ({
 
   const requirement = await getRequirementById(ids[0]);
 
-  console.log(requirement);
   
   return (
     <>

@@ -132,7 +132,7 @@ export default function NotificationButton() {
           </div>
 
           <div
-            onClick={() => router.push("/admin/notifications")}
+            onClick={() => router.push("/admin/notifications") }
             className="p-2 text-center text-sm text-blue-500 cursor-pointer hover:underline"
           >
             See all

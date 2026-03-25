@@ -1,32 +1,42 @@
 "use server";
 
-import { Module } from "@/types";
 import { prisma } from "../db/prisma-helper";
 import { formatError } from "../utils";
 import { moduleSchema } from "../validators";
+import { Module } from "@/types";
 
-export async function getModules() {
-  //return await prisma.module.findMany()
-  const modules = await prisma.module.findMany({
-    include: {
-      roleModules: {
-        include: {
-          role: true,
-        },
-      },
-    },
-  });
-  return modules;
+type ActionResponse = {
+  success: boolean;
+  message: string;
+};
+
+type PrismaModule = Awaited<ReturnType<typeof prisma.module.findFirst>>;
+
+function mapModule(m: NonNullable<PrismaModule>): Module {
+  return {
+    id: m.id,
+    name: m.name,
+    description: m.description,
+    route: m.route,
+    status: m.status,
+    createdAt: m.createdAt.toISOString(),
+    updatedAt: m.updatedAt?.toISOString(),
+  };
 }
 
-// create module
-export async function createModule(data: any) {
+export async function getModules(): Promise<Module[]> {
+  const modules = await prisma.module.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
+  return modules.map(mapModule);
+}
+
+export async function createModule(data: any): Promise<ActionResponse> {
   try {
     const module = moduleSchema.parse(data);
 
-    const route = `/admin/${module.name
-      .toLowerCase()
-      .replace(/\s+/g, "-")}`;
+    const route = `/admin/${module.name.toLowerCase().replace(/\s+/g, "-")}`;
 
     await prisma.module.create({
       data: {
@@ -42,7 +52,6 @@ export async function createModule(data: any) {
       message: "Module created successfully",
     };
   } catch (error) {
-    console.log(error); // 👈 ADD THIS FOR DEBUG
     return {
       success: false,
       message: formatError(error),
@@ -50,24 +59,23 @@ export async function createModule(data: any) {
   }
 }
 
-// get module by id
 export async function getModuleById(id: string) {
   try {
-    let module = await prisma.module.findFirst({
+    const module = await prisma.module.findUnique({
       where: { id },
     });
 
-    if (module) {
+    if (!module) {
       return {
-        success: true,
-        data: module,
-        message: "Module get successfully",
+        success: false,
+        message: "Module not found",
       };
     }
 
     return {
-      success: false,
-      message: "Module not found",
+      success: true,
+      data: mapModule(module), 
+      message: "Module fetched successfully",
     };
   } catch (error) {
     return {
@@ -77,10 +85,13 @@ export async function getModuleById(id: string) {
   }
 }
 
-// update module
-export async function updateModule(data: any, id: string) {
+export async function updateModule(
+  data: any,
+  id: string,
+): Promise<ActionResponse> {
   try {
     const module = moduleSchema.parse(data);
+
     const route = `/admin/${module.name.toLowerCase().replace(/\s+/g, "-")}`;
 
     await prisma.module.update({
@@ -105,9 +116,26 @@ export async function updateModule(data: any, id: string) {
   }
 }
 
-// delete module
-export async function deleteModule(id: any) {
+export async function deleteModule(id: string): Promise<ActionResponse> {
   try {
+    const module = await prisma.module.findUnique({
+      where: { id },
+    });
+
+    if (!module) {
+      return {
+        success: false,
+        message: "Module not found",
+      };
+    }
+
+    if (module.route === "/admin") {
+      return {
+        success: false,
+        message: "Core module cannot be deleted",
+      };
+    }
+
     await prisma.module.delete({
       where: { id },
     });

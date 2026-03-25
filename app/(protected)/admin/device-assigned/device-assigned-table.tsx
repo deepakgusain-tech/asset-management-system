@@ -17,8 +17,8 @@ type Props = {
   data: DeviceAssigned[];
   devices: Device[];
   employees: Employee[];
-  canEdit: boolean;     // ✅ added
-  canDelete: boolean;   // ✅ added
+  canEdit: boolean;     
+  canDelete: boolean;   
 };
 
 const DeviceAssignedTable = ({
@@ -75,23 +75,20 @@ const DeviceAssignedTable = ({
 
             <TableCell className="flex gap-2">
 
-              {/* View always allowed */}
               <Button asChild variant="outline">
-                <Link href={`/device/${item.deviceId}/history?assignedId=${item.id}`}>
+                <Link href={`/admin/device/${item.deviceId}/history?assignedId=${item.id}`}>
                   <Info />
                 </Link>
               </Button>
 
-              {/* ✅ EDIT RBAC */}
               {canEdit && (
                 <Button asChild className="bg-orange-500 hover:bg-orange-600">
-                  <Link href={`/device-assigned/edit/${item.id}`}>
+                  <Link href={`/admin/device-assigned/edit/${item.id}`} >
                     <EditIcon />
                   </Link>
                 </Button>
               )}
 
-              {/* ✅ DELETE RBAC */}
               {canDelete && (
                 <Button
                   variant="destructive"
