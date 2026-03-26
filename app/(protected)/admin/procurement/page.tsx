@@ -30,27 +30,21 @@ const ProcurementPage = async () => {
   await getProcurement();
 
   return (
-    <Card className="mt-2">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1 className="text-lg font-semibold">Procurement</h1>
-
-          {canCreate && (
+    <div className="mt-2">
+      <ProcurementTable
+        canApprove={canEdit}
+        canReject={canEdit}
+        canDelete={canDelete}
+        title="Procurement"
+        actions={
+          canCreate && (
             <Button className="bg-blue-500 hover:bg-blue-600">
               <Link href="/admin/procurement/create">Add Procurement</Link>
             </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent className="w-full">
-        <ProcurementTable
-          canApprove={canEdit}
-          canReject={canEdit}
-          canDelete={canDelete}
-        />
-      </CardContent>
-    </Card>
+          )
+        }
+      />
+    </div>
   );
 };
 

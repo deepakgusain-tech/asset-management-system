@@ -10,13 +10,11 @@ import { redirect } from "next/navigation";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const UserPage = async () => {
- 
   const session = await auth();
   if (!session?.user?.email) {
     redirect("/sign-in");
   }
 
- 
   const user = await getUserPermissions(session.user.email);
   const route = "/admin/user";
 
@@ -31,31 +29,24 @@ const UserPage = async () => {
   const canEdit = isAdmin || canAccess(user, route, "edit");
   const canDelete = isAdmin || canAccess(user, route, "delete");
 
- 
   const users = await getUsers();
 
   return (
-    <Card className="mt-2">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>User</h1>
-
-          {canCreate && (
-            <Button asChild className="bg-blue-500 hover:bg-blue-600">
+    <div className="mt-2">
+        <UserTable 
+        data={users} 
+        canEdit={canEdit} 
+        canDelete={canDelete} 
+        title="User"
+        actions={
+          canCreate && (
+            <Button className="bg-blue-500 hover:bg-blue-600">
               <Link href="/admin/user/create">Add User</Link>
             </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <UserTable
-          data={users}
-          canEdit={canEdit}
-          canDelete={canDelete}
+          )
+        }
         />
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 

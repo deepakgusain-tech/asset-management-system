@@ -31,27 +31,21 @@ const ModulePage = async () => {
   const modules = await getModules();
 
   return (
-    <Card className="mt-2">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>Module</h1>
-
-          {canCreate && (
+    <div className="mt-2">
+      <ModuleTable
+        data={modules as Module[]}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        title="Module"
+        actions={
+          canCreate && (
             <Button className="bg-blue-500 hover:bg-blue-600" asChild>
               <Link href="/admin/module/create">Add Module</Link>
             </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <ModuleTable
-          data={modules as unknown as Module[]}
-          canEdit={canEdit}
-          canDelete={canDelete}
-        />
-      </CardContent>
-    </Card>
+          )
+        }
+      />
+    </div>
   );
 };
 

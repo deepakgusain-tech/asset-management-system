@@ -9,8 +9,8 @@ import { redirect } from "next/navigation";
 import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const RequirementsPage = async () => {
-
   const session = await auth();
+
   if (!session?.user?.email) {
     redirect("/sign-in");
   }
@@ -27,32 +27,26 @@ const RequirementsPage = async () => {
   const canDelete = canAccess(user, route, "delete");
 
   const requirements = await getRequirement();
-  
 
   return (
-    <Card className="mt-2 shadow-sm">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>Requirement</h1>
-
-          {canCreate && (
-            <Button className="bg-blue-500">
-              <Link href="/admin/requirements/create">
-                Add Requirements
-              </Link>
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent>
+    <div className="mt-2"> 
         <RequirementTable
           requirement={requirements as Requirement[]}
           canEdit={canEdit}
           canDelete={canDelete}
+          title="Requirements"
+          actions={
+            canCreate && (
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                <Link href="/admin/requirements/create">
+                  Add Requirements
+                </Link>
+              </Button>
+            )
+          }
+
         />
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 

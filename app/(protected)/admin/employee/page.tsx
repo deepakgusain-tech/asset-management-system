@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import Link from "next/link";
 import EmployeeTable from "./employee-table";
 import { getEmployee } from "@/lib/actions/employee";
@@ -10,6 +9,7 @@ import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const EmployeePage = async () => {
   const session = await auth();
+
   if (!session?.user?.email) {
     redirect("/sign-in");
   }
@@ -31,28 +31,25 @@ const EmployeePage = async () => {
   const employees = await getEmployee();
 
   return (
-    <Card className="mt-2">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>Employee</h1>
+  <div className="mt-2">
 
-          {canCreate && (
-            <Button className="bg-blue-500 hover:bg-blue-600">
-              <Link href="/admin/employee/create">Add Employee</Link>
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <EmployeeTable
-          data={employees as Employee[]}
-          canEdit={canEdit}
-          canDelete={canDelete}
-        />
-      </CardContent>
-    </Card>
-  );
+    <EmployeeTable
+      data={employees as Employee[]}
+      canEdit={canEdit}
+      canDelete={canDelete}
+      title="Employee"
+      actions={
+        canCreate && (
+          <Button className="bg-blue-500 hover:bg-blue-600">
+            <Link href="/admin/employee/create">
+              Add Employee
+            </Link>
+          </Button>
+        )
+      }
+    />
+  </div>
+);
 };
 
 export default EmployeePage;

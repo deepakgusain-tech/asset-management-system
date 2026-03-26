@@ -18,38 +18,37 @@ const DevicePage = async () => {
 
   const user = await getUserPermissions(session.user.email);
 
-  if (!canAccess(user, "/admin/device", "view")) {
+  const route = "/admin/device";
+
+  if (!canAccess(user, route, "view")) {
     redirect("/404");
   }
 
   const device = await getDevice();
 
-  const canCreate = canAccess(user, "/admin/device", "create");
-  const canEdit = canAccess(user, "/admin/device", "edit");
-  const canDelete = canAccess(user, "/admin/device", "delete");
+  const canCreate = canAccess(user, route, "create");
+  const canEdit = canAccess(user, route, "edit");
+  const canDelete = canAccess(user, route, "delete");
 
   return (
-    <Card className="mt-2 shadow-sm">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>Device</h1>
+    <div className="mt-2">
 
-          {canCreate && (
-            <Button className="bg-blue-500 hover:bg-blue-600">
-              <Link href="device/create">Add Device</Link>
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <DeviceTable
+      <DeviceTable
           data={device as Device[]}
           canEdit={canEdit}
           canDelete={canDelete}
+          title="Device"
+          actions={
+            canCreate && (
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                <Link href="/admin/device/create">
+                  Add Device
+                </Link>
+              </Button>
+            )
+          }
         />
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 

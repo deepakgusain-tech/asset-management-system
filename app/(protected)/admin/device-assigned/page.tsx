@@ -39,31 +39,27 @@ const DeviceAssignedPage = async () => {
   ]);
 
   return (
-    <Card className="mt-2">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>Device Assigned</h1>
-
-          {canCreate && (
-            <Button className="bg-blue-500 hover:bg-blue-600">
-              <Link href="/admin/device-assigned/create">
-                Add Device Assigned
-              </Link>
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-
+    <div className="mt-2">
       <CardContent className="w-full">
         <DeviceAssignedTable
           data={deviceAssigned}
           devices={devices as Device[]}
           employees={employees as Employee[]}
           canEdit={canEdit}
-          canDelete={canDelete} 
+          canDelete={canDelete}
+          title="Device Assigned"
+          actions={
+            canCreate && (
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                <Link href="/admin/device-assigned/create">
+                  Add Device Assigned
+                </Link>
+              </Button>
+            )
+          }
         />
       </CardContent>
-    </Card>
+    </div>
   );
 };
 

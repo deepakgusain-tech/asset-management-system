@@ -32,29 +32,24 @@ const CategoryPage = async () => {
   const categories = await getDeviceCategory();
 
   return (
-    <Card className="mt-2">
-      <CardHeader>
-        <div className='flex justify-between items-center'>
-          <h1>Device Category</h1>
-
-          {canCreate && (
-            <Button className='bg-blue-500 hover:bg-blue-600'>
-              <Link href="/admin/device-category/create">
-                Add Device Category
-              </Link>
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent className='w-full'>
+    <div className="mt-2">
         <DeviceCategoryTable
           data={categories as DeviceCategory[]}
           canEdit={canEdit}
           canDelete={canDelete}
+          title="Device Category"
+          actions={
+            canCreate && (
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                <Link href="/admin/device-category/create">
+                  Add Device Category
+                </Link>
+              </Button>
+            )
+          }
+
         />
-      </CardContent>
-    </Card>
+    </div>
   )
 }
 

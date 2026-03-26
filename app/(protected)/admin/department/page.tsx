@@ -9,6 +9,7 @@ import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const DepartmentPage = async () => {
   const session = await auth();
+
   if (!session?.user?.email) {
     redirect("/sign-in");
   }
@@ -30,29 +31,21 @@ const DepartmentPage = async () => {
   const department = await getDepartment();
 
   return (
-    <Card className="mt-2 shadow-sm">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>Department</h1>
-
-          {canCreate && (
+    <div className="mt-2">
+      <DepartmentTable
+        data={department}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        title="Department"
+        actions={
+          canCreate && (
             <Button className="bg-blue-500 hover:bg-blue-600">
-              <Link href="/admin/department/create">
-                Add Department
-              </Link>
+              <Link href="/admin/department/create">Add Department</Link>
             </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent>
-        <DepartmentTable
-          data={department}
-          canEdit={canEdit}
-          canDelete={canDelete}
-        />
-      </CardContent>
-    </Card>
+          )
+        }
+      />
+    </div>
   );
 };
 

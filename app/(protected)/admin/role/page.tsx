@@ -34,27 +34,22 @@ const RolePage = async () => {
   const roles = await getRoles();
 
   return (
-    <Card className="mt-2">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1>Role</h1>
-
-          {canCreate && (
-            <Button asChild className="bg-blue-500 hover:bg-blue-600">
+    <div className="mt-2">
+        <RoleTable 
+        data={roles} 
+        canEdit={canEdit} 
+        canDelete={canDelete} 
+        title="Role" 
+        actions={
+          canCreate && (
+            <Button className="bg-blue-500 hover:bg-blue-600">
               <Link href="/admin/role/create">Add Role</Link>
             </Button>
-          )}
-        </div>
-      </CardHeader>
+          )
+        }
 
-      <CardContent>
-        <RoleTable
-          data={roles}
-          canEdit={canEdit}
-          canDelete={canDelete}
         />
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 

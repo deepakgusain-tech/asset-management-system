@@ -10,6 +10,7 @@ import { getUserPermissions, canAccess } from "@/lib/rbac";
 
 const VendorPage = async () => {
   const session = await auth();
+
   if (!session?.user?.email) {
     redirect("/sign-in");
   }
@@ -28,29 +29,24 @@ const VendorPage = async () => {
   const vendors = await getVendors();
 
   return (
-    <Card className="mt-2">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <h1 className="text-lg font-semibold">Vendor</h1>
-
-          {canCreate && (
-            <Button className="bg-blue-500 hover:bg-blue-600">
-              <Link href="/admin/vendor/create">
-                Add Vendor
-              </Link>
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent>
+    <div className="mt-2">
         <VendorTable
           vendor={vendors as Vendor[]}
           canEdit={canEdit}
           canDelete={canDelete}
+          title="Vendor"
+          actions={
+            canCreate && (
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                <Link href="/admin/vendor/create">
+                  Add Vendor
+                </Link>
+              </Button>
+            )
+          }
+
         />
-      </CardContent>
-    </Card>
+    </div>
   );
 };
 
