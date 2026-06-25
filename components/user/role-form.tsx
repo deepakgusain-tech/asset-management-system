@@ -200,7 +200,7 @@ const RoleForm = ({
 
           {/* ✅ 3 MODULES PER ROW */}
           <div className="grid grid-cols-3 gap-4">
-            {modules.map((m) => {
+            {modules.length > 0  && modules.map((m) => {
               const selected = selectedModules.find(
                 (sm) => sm.moduleId === m.id,
               );

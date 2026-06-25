@@ -25,7 +25,6 @@ const VendorPage = async () => {
   const canCreate = canAccess(user, route, "create");
   const canEdit = canAccess(user, route, "edit");
   const canDelete = canAccess(user, route, "delete");
-
   const vendors = await getVendors();
 
   return (
@@ -44,7 +43,6 @@ const VendorPage = async () => {
               </Button>
             )
           }
-
         />
     </div>
   );
